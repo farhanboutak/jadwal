@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generator Jadwal Pelajaran</title>
+<title>Generator Jadwal Pelajaran – Layout Lebih Besar</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -61,7 +61,7 @@ header {
 .btn-danger:hover { opacity: 0.88; }
 
 /* Main */
-main { max-width: 960px; margin: 0 auto; padding: 28px 20px; }
+main { max-width: 1200px; margin: 0 auto; padding: 28px 20px; } /* Lebar maksimal diperbesar */
 
 /* Card */
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 24px; }
@@ -114,103 +114,140 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 .output-title p { font-size: 0.75rem; color: var(--text2); margin-top: 3px; }
 .export-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 
-/* Filter */
-.filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-.search-wrap { flex: 1; min-width: 180px; position: relative; }
-.search-wrap input { padding-left: 36px; }
+/* Filter bar with extra controls */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  background: var(--surface2);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.search-wrap { flex: 2; min-width: 200px; position: relative; }
+.search-wrap input { padding-left: 36px; width: 100%; }
 .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; color: var(--text2); pointer-events: none; }
 .filter-select { min-width: 130px; cursor: pointer; }
+.range-wrap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.range-wrap label { font-size: 0.8rem; font-weight: 600; color: var(--text2); }
+.range-wrap input[type=range] { width: 120px; }
+#font-size-value { min-width: 45px; text-align: center; font-weight: 600; }
 
-/* ═══ THE SCHEDULE GRID TABLE ═══ */
+/* Checkbox time row */
+.time-toggle-wrap { display: flex; align-items: center; gap: 6px; }
+.time-toggle-wrap input { width: 16px; height: 16px; cursor: pointer; }
+.time-toggle-wrap label { font-size: 0.8rem; font-weight: 500; cursor: pointer; }
+
+/* ═══ THE SCHEDULE GRID TABLE (diperbesar) ═══ */
 #jadwal-print-area {
   background: white;
-  padding: 18px 20px 14px;
+  padding: 24px 28px 20px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   color: #111;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 [data-theme="dark"] #jadwal-print-area { background: #1e293b; color: #e2e8f0; border-color: #334155; }
 
-.jadwal-title-block { text-align: center; margin-bottom: 14px; }
-.jadwal-main-title { font-size: 0.82rem; font-weight: 600; color: #333; margin-bottom: 3px; }
-.jadwal-kelas-name { font-size: 1.6rem; font-weight: 800; color: #111; letter-spacing: 0.01em; }
+.jadwal-title-block { text-align: center; margin-bottom: 20px; }
+.jadwal-main-title { font-size: 1rem; font-weight: 600; color: #333; margin-bottom: 4px; letter-spacing: 0.3px; }
+.jadwal-kelas-name { font-size: 2rem; font-weight: 800; color: #111; letter-spacing: 0.01em; }
 [data-theme="dark"] .jadwal-main-title { color: #94a3b8; }
 [data-theme="dark"] .jadwal-kelas-name { color: #e2e8f0; }
 
 .sched-grid-wrap { overflow-x: auto; }
 .sched-grid {
   width: 100%; border-collapse: collapse;
-  font-size: 0.8rem; min-width: 700px;
-  border: 2px solid #333;
+  font-size: 1rem; /* lebih besar dari sebelumnya */
+  min-width: 800px;
+  border: 2px solid #222;
 }
 [data-theme="dark"] .sched-grid { border-color: #475569; }
 .sched-grid th, .sched-grid td {
-  border: 1px solid #aaa;
+  border: 1px solid #888;
   text-align: center;
   vertical-align: middle;
-  padding: 0;
+  padding: 12px 8px; /* padding lebih besar */
 }
 [data-theme="dark"] .sched-grid th, [data-theme="dark"] .sched-grid td { border-color: #475569; }
 
 /* Header row (jam numbers) */
 .sched-grid thead th {
-  background: #f5f5f5;
+  background: #eaeef5;
   font-weight: 700;
-  font-size: 0.82rem;
-  padding: 8px 4px;
-  color: #222;
-  border: 1px solid #aaa;
+  font-size: 1rem;
+  padding: 12px 6px;
+  color: #1e293b;
+  border: 1px solid #888;
 }
 [data-theme="dark"] .sched-grid thead th { background: #0f172a; color: #e2e8f0; border-color: #475569; }
 
 /* Day column */
 .col-hari {
-  width: 72px; min-width: 72px;
+  width: 90px; min-width: 90px;
   font-weight: 800;
-  font-size: 0.9rem;
-  background: #f9f9f9;
-  padding: 10px 6px;
-  color: #111;
-  border-right: 2px solid #777 !important;
+  font-size: 1.1rem;
+  background: #f1f5f9;
+  padding: 14px 8px;
+  color: #0b1e33;
+  border-right: 2px solid #555 !important;
 }
-[data-theme="dark"] .col-hari { background: #1e293b; color: #e2e8f0; border-right-color: #475569 !important; }
+[data-theme="dark"] .col-hari { background: #1e293b; color: #e2e8f0; border-right-color: #64748b !important; }
 
 /* Subject cell */
 .cell-mapel {
-  padding: 7px 6px;
-  line-height: 1.35;
-  font-size: 0.78rem;
+  padding: 12px 10px;
+  line-height: 1.4;
+  font-size: 0.95rem;
 }
-.cell-mapel .mapel { font-weight: 700; font-size: 0.82rem; color: #111; display: block; }
-.cell-mapel .guru { font-size: 0.7rem; color: #555; display: block; margin-top: 2px; font-style: italic; }
+.cell-mapel .mapel { font-weight: 700; font-size: 1rem; color: #111; display: block; margin-bottom: 4px; }
+.cell-mapel .guru { font-size: 0.8rem; color: #444; display: block; font-style: italic; }
 [data-theme="dark"] .cell-mapel .mapel { color: #e2e8f0; }
-[data-theme="dark"] .cell-mapel .guru { color: #94a3b8; }
+[data-theme="dark"] .cell-mapel .guru { color: #9aa9c1; }
 
 /* Special cells */
 .cell-empty { background: #fafafa; }
-.cell-gls { background: #fffde7; }
-.cell-upcr { background: #e8f5e9; }
-.cell-bk { background: #fce4ec; }
-.cell-krida { background: #e3f2fd; }
-[data-theme="dark"] .cell-gls { background: #2d2a0a; }
-[data-theme="dark"] .cell-upcr { background: #0a2d18; }
-[data-theme="dark"] .cell-bk { background: #2d0a15; }
-[data-theme="dark"] .cell-krida { background: #0a1a2d; }
+.cell-gls { background: #fff9c6; }
+.cell-upcr { background: #d9f0d9; }
+.cell-bk { background: #fad1e6; }
+.cell-krida { background: #c9e2f9; }
+[data-theme="dark"] .cell-gls { background: #3a351a; }
+[data-theme="dark"] .cell-upcr { background: #1a3a1a; }
+[data-theme="dark"] .cell-bk { background: #3a1a2a; }
+[data-theme="dark"] .cell-krida { background: #1a2a3a; }
 
-/* Time row */
+/* Time row (lebih besar juga) */
 .time-row td {
-  font-size: 0.66rem; color: #888; background: #f9f9f9;
-  padding: 3px 2px; border-top: none;
+  font-size: 0.8rem; color: #666; background: #f9f9f9;
+  padding: 6px 4px; border-top: none;
   font-family: 'JetBrains Mono', monospace;
 }
-[data-theme="dark"] .time-row td { background: #1e293b; color: #64748b; }
+[data-theme="dark"] .time-row td { background: #1e293b; color: #94a3b8; }
 
 /* Footer */
 .jadwal-footer {
   display: flex; justify-content: space-between; align-items: center;
-  margin-top: 10px; font-size: 0.68rem; color: #888;
-  padding: 0 2px;
+  margin-top: 16px; font-size: 0.75rem; color: #888;
+  padding: 0 4px;
 }
+
+/* Dynamic font size classes (akan diatur via JS) */
+.sched-grid.font-small { font-size: 0.8rem; }
+.sched-grid.font-small .col-hari { font-size: 0.9rem; }
+.sched-grid.font-small .cell-mapel .mapel { font-size: 0.85rem; }
+.sched-grid.font-small .cell-mapel .guru { font-size: 0.7rem; }
+
+.sched-grid.font-medium { font-size: 1rem; } /* default */
+.sched-grid.font-medium .col-hari { font-size: 1.1rem; }
+.sched-grid.font-medium .cell-mapel .mapel { font-size: 1rem; }
+.sched-grid.font-medium .cell-mapel .guru { font-size: 0.8rem; }
+
+.sched-grid.font-large { font-size: 1.2rem; }
+.sched-grid.font-large .col-hari { font-size: 1.3rem; }
+.sched-grid.font-large .cell-mapel .mapel { font-size: 1.2rem; }
+.sched-grid.font-large .cell-mapel .guru { font-size: 0.95rem; }
 
 /* Toast */
 #toast {
@@ -228,15 +265,13 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   body * { visibility: hidden; }
   #jadwal-print-area, #jadwal-print-area * { visibility: visible; }
   #jadwal-print-area { position: fixed; left: 0; top: 0; width: 100%; padding: 12px; }
-  .sched-grid { font-size: 0.72rem; min-width: unset; }
+  .sched-grid { font-size: 0.9rem; min-width: unset; }
 }
 
 /* Responsive */
-@media (max-width: 640px) {
-  .form-row-2 { grid-template-columns: 1fr; }
-  .card-body { padding: 16px; }
-  .export-btns .btn { font-size: 0.78rem; padding: 8px 12px; }
-  .jadwal-kelas-name { font-size: 1.2rem; }
+@media (max-width: 800px) {
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .range-wrap, .time-toggle-wrap { justify-content: flex-start; }
 }
 </style>
 </head>
@@ -247,7 +282,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
     <div class="logo-icon">📅</div>
     <div>
       <h1>Jadwal Pelajaran</h1>
-      <span>Generator Jadwal Format Grid</span>
+      <span>Generator Ukuran Besar + Fitur Lengkap</span>
     </div>
   </div>
   <div class="header-actions">
@@ -301,13 +336,13 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
       <div><h2>Waktu Jam Pelajaran</h2><p>Opsional — isi waktu tiap jam untuk ditampilkan di jadwal</p></div>
     </div>
     <div class="card-body">
-      <!-- Checkbox untuk mengosongkan semua jam -->
+      <!-- Checkbox untuk mengosongkan semua jam (default dicentang) -->
       <div class="clear-jam-wrapper">
-        <input type="checkbox" id="clear-jam-checkbox">
+        <input type="checkbox" id="clear-jam-checkbox" checked>
         <label for="clear-jam-checkbox">Kosongkan semua jam (sembunyikan waktu)</label>
       </div>
       <div class="jam-config" id="jam-config-wrap"></div>
-      <p class="form-hint" style="margin-top:12px;">💡 Kosongkan jika tidak ingin menampilkan waktu.</p>
+      <p class="form-hint" style="margin-top:12px;">💡 Kosongkan jika tidak ingin menampilkan waktu (seperti foto).</p>
     </div>
   </div>
 
@@ -354,6 +389,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
       </div>
     </div>
 
+    <!-- Filter bar dengan fitur baru -->
     <div class="filter-bar">
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
@@ -364,6 +400,19 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
         <option>Senin</option><option>Selasa</option><option>Rabu</option>
         <option>Kamis</option><option>Jumat</option>
       </select>
+
+      <!-- Pengatur ukuran font -->
+      <div class="range-wrap">
+        <label for="font-size-slider">🔤 Ukuran:</label>
+        <input type="range" id="font-size-slider" min="0.8" max="1.5" step="0.1" value="1.0">
+        <span id="font-size-value">1.0rem</span>
+      </div>
+
+      <!-- Toggle baris waktu -->
+      <div class="time-toggle-wrap">
+        <input type="checkbox" id="show-time-row" onchange="renderGrid()">
+        <label for="show-time-row">⏲️ Tampilkan jam</label>
+      </div>
     </div>
 
     <!-- The printable grid area -->
@@ -386,7 +435,14 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 <div id="toast"></div>
 
 <script>
+// ==================  PERBAIKAN AGAR TAMPILAN SEPERTI FOTO ==================
+// 1. Menambahkan kode-kode guru sesuai nama yang muncul di foto
+// 2. Checkbox "Kosongkan semua jam" dicentang default, sehingga baris waktu tidak tampil
+// 3. Contoh data (loadContoh) diisi menyerupai jadwal di foto image.png
+// 4. Penambahan slider ukuran font & toggle baris waktu
+
 const kodeGuru = {
+  // Kode asli (tetap dipertahankan)
   "A1": { nama: "Dra. Siti Rahayu", mapel: "PA. Islam" },
   "A2": { nama: "Dwi Sidik Purnomo", mapel: "PA. Islam" },
   "A3": { nama: "Akhmad Affandi", mapel: "PA. Islam" },
@@ -451,11 +507,28 @@ const kodeGuru = {
   "Krida": { nama: "", mapel: "Krida" },
   "BK": { nama: "", mapel: "BK" },
   "-": { nama: "", mapel: "" },
+
+  // ==========  KODE BARU AGAR SESUAI FOTO  ==========
+  "DTK": { nama: "Detok Wijayanto", mapel: "Bahasa Indonesia" },
+  "END": { nama: "Endang Kartiningisih", mapel: "Matematika" },
+  "YTS": { nama: "Yati Siti Alinah", mapel: "IPS" },
+  "SGS": { nama: "Sigit Suryono", mapel: "Informatika" },
+  "SRW": { nama: "Sri Widyantingsih", mapel: "Penjas" },
+  "IDS": { nama: "Idia Susilawati", mapel: "IPA" },
+  "ID2": { nama: "Ida Susilawati", mapel: "IPA" },
+  "NRM": { nama: "Nuraini Indrasmuyati", mapel: "BK" },
+  "DRS": { nama: "Dari Setiyowati", mapel: "Seni Budaya" },
+  "KHD": { nama: "Khida", mapel: "Krida" },
+  "SSC": { nama: "Sisca Ayu Utami", mapel: "Matematika" },
+  "KBN": { nama: "Khida", mapel: "Krida" } // KBN -> Krida
 };
 
 const HARI = ['Senin','Selasa','Rabu','Kamis','Jumat'];
 let scheduleData = [];
 let defaultJamTimes = []; // Menyimpan nilai default jam
+
+// Variabel global untuk kontrol tampilan
+let _showTimeRow = false; // default tidak tampil
 
 // ── Dark mode ──
 document.getElementById('theme-toggle').onclick = () => {
@@ -595,9 +668,22 @@ function renderGrid() {
   const hariFilter = document.getElementById('filter-hari')?.value||'';
   const displayHari = hariFilter ? scheduleData.filter(d=>d.hari===hariFilter) : scheduleData;
 
+  // Ambil status toggle baris waktu
+  _showTimeRow = document.getElementById('show-time-row').checked;
+
+  // Ambil nilai slider ukuran font
+  const fontSize = parseFloat(document.getElementById('font-size-slider').value);
+  document.getElementById('font-size-value').textContent = fontSize.toFixed(1) + 'rem';
+  const table = document.getElementById('sched-grid-table');
+  // Hapus semua kelas font
+  table.classList.remove('font-small', 'font-medium', 'font-large');
+  if (fontSize <= 0.9) table.classList.add('font-small');
+  else if (fontSize >= 1.2) table.classList.add('font-large');
+  else table.classList.add('font-medium'); // 1.0 default
+
   // Build table
   let html = '<thead><tr>';
-  html += `<th style="width:72px">Hari</th>`;
+  html += `<th style="width:90px">Hari</th>`;
   for (let i = 1; i <= jamPerHari; i++) html += `<th>${i}</th>`;
   html += '</tr></thead>';
 
@@ -650,9 +736,8 @@ function renderGrid() {
     }
     html += `</tr>`;
 
-    // Time sub-row if any time defined
-    const hasTime = jamTimes.some(t=>t);
-    if (hasTime) {
+    // Time sub-row if toggle on
+    if (_showTimeRow) {
       html += `<tr class="time-row"><td></td>`;
       for (let i=0;i<jamPerHari;i++) html += `<td>${jamTimes[i]||''}</td>`;
       html += `</tr>`;
@@ -667,10 +752,15 @@ function getSpecialClass(kode) {
   const k = kode.toLowerCase();
   if (k === 'gls') return 'cell-gls';
   if (k === 'upcr' || k === 'upacara') return 'cell-upcr';
-  if (k === 'bk') return 'cell-bk';
-  if (k === 'krida') return 'cell-krida';
+  if (k === 'bk' || k === 'nrm') return 'cell-bk';
+  if (k === 'krida' || k === 'khd' || k === 'kbn') return 'cell-krida';
   return '';
 }
+
+// Event listener untuk slider font
+document.getElementById('font-size-slider').addEventListener('input', function() {
+  renderGrid();
+});
 
 // === FUNGSI CAPTURE DENGAN CLONE (SOLUSI FULL LEBAR) ===
 function captureElementFull(element) {
@@ -707,7 +797,7 @@ function captureElementFull(element) {
   });
 }
 
-// ── Download JPG dengan rasio 4:3 (tanpa penskalaan gambar, tanpa pemotongan) ──
+// ── Download JPG dengan rasio 4:3 ──
 function downloadJPG() {
   if (scheduleData.length === 0) {
     showToast('❌ Buat jadwal terlebih dahulu');
@@ -723,13 +813,10 @@ function downloadJPG() {
 
     // Tentukan ukuran canvas target agar dapat menampung seluruh gambar asli dan memiliki rasio 4:3
     let targetW, targetH;
-    // Coba dengan lebar = max(origW, origH * 4/3)
     let w1 = Math.max(origW, origH * targetRatio);
     let h1 = w1 / targetRatio;
-    // Coba dengan tinggi = max(origH, origW / targetRatio)
     let h2 = Math.max(origH, origW / targetRatio);
     let w2 = h2 * targetRatio;
-    // Pilih yang lebih besar (agar gambar muat)
     if (w1 * h1 >= w2 * h2) {
       targetW = Math.round(w1);
       targetH = Math.round(h1);
@@ -765,7 +852,7 @@ function downloadJPG() {
   });
 }
 
-// ── Download PDF dengan rasio 4:3 (sudah aman) ──
+// ── Download PDF dengan rasio 4:3 ──
 function downloadPDF() {
   if (scheduleData.length === 0) {
     showToast('❌ Buat jadwal terlebih dahulu');
@@ -844,20 +931,34 @@ function clearForm() {
 }
 
 function loadContoh() {
+  // Mengisi data sesuai dengan foto yang dikirim
   document.getElementById('nama-kelas').value = 'VII E';
   document.getElementById('nama-sekolah').value = 'SMP Negeri 1 Semarang';
   document.getElementById('semester').value = 'Semester 1 Tahun Pelajaran 2022/2023';
   document.getElementById('tgl-mulai').value = 'Mulai 18 Juli 2022';
   document.getElementById('jam-per-hari').value = 10;
   buildJamConfig();
-  document.getElementById('kodes').value =
-    'Upcr D4 D4 T3 T3 G1 G1 J1 J1 H1 ' +
-    'GLS GLS G2 G2 BK Y1 Y1 IF1 IF1 IF1 ' +
-    'GLS GLS J2 J2 J2 C2 C2 C2 A1 A1 ' +
-    'D4 D4 D4 T3 S1 S1 T3 T3 G1 G1 ' +
-    'Krida Krida Krida W1 W1 W1 R1 R1 R1';
+  
+  // Pastikan checkbox dicentang (jam kosong)
+  document.getElementById('clear-jam-checkbox').checked = true;
+  clearAllJamFields(true);
+
+  // Kode-kode yang disusun menyerupai foto (berdasarkan interpretasi)
+  // Senin: Upcr, DTK DTK, END END, YTS YTS, G1 G1 G1 (sisa 3 jam)
+  // Selasa: GLS GLS, NRM, DRS DRS, SGS SGS SGS, IF1 IF1
+  // Rabu: GLS GLS, SRW SRW SRW, IDS IDS IDS, A1 A1
+  // Kamis: DTK DTK DTK, END END, YTS YTS, ID2 ID2, SSC (1 jam)
+  // Jumat: KBN KBN KBN, W1 W1 W1, R1 R1
+  const contohKode = 
+    'Upcr DTK DTK END END YTS YTS G1 G1 G1 ' +                 // Senin (10)
+    'GLS GLS NRM DRS DRS SGS SGS SGS IF1 IF1 ' +               // Selasa (10)
+    'GLS GLS SRW SRW SRW IDS IDS IDS A1 A1 ' +                 // Rabu (10)
+    'DTK DTK DTK END END YTS YTS ID2 ID2 SSC ' +               // Kamis (10)
+    'KBN KBN KBN W1 W1 W1 R1 R1';                              // Jumat (9)
+
+  document.getElementById('kodes').value = contohKode;
   document.getElementById('kodes').dispatchEvent(new Event('input'));
-  showToast('📋 Contoh data dimuat!');
+  showToast('📋 Contoh data mirip foto dimuat!');
 }
 
 // ── Fitur Simpan ke localStorage ──
@@ -913,6 +1014,114 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
+</script>
+<footer style="text-align:center; margin: 20px 0; font-size:0.75rem; color:var(--text2);">
+  dibuat oleh <a href="https://www.instagram.com/a.farhanhan/" target="_blank">Ammar Farhan</a> | <a href="https://github.com/farhanboutak/jadwal" target="_blank">GitHub</a>
+</footer>
+<!-- Modal Popup Marhaban ya Ramadhan -->
+<div id="ramadhan-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <div class="modal-body">
+      <span class="modal-icon">🌙</span>
+      <h2>Marhaban ya Ramadhan</h2>
+      <p>Selamat menunaikan ibadah puasa. Semoga bulan suci ini membawa berkah.</p>
+      <button class="btn btn-primary" onclick="closeModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Modal styling */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s;
+}
+
+.modal-content {
+  background: var(--surface);
+  border-radius: var(--radius);
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  animation: slideUp 0.3s;
+}
+
+.modal-body {
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.modal-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.modal h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.modal p {
+  color: var(--text2);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.close-btn {
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 8px 16px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: var(--accent);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+</style>
+
+<script>
+function showModal() {
+  document.getElementById('ramadhan-modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('ramadhan-modal').style.display = 'none';
+}
+
+window.addEventListener('load', function() {
+  setTimeout(showModal, 1000);
+});
 </script>
 </body>
 </html>
