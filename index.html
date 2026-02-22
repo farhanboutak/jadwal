@@ -688,17 +688,11 @@ function captureElementFull(element) {
     container.appendChild(clone);
     document.body.appendChild(container);
 
-    // Pastikan elemen clone memiliki latar belakang putih (karena aslinya bisa mengikuti tema)
-    // Tapi lebih baik kita set di sini karena clone mewarisi class, jadi CSS sudah mengatur.
-    // Namun untuk amannya, kita bisa paksa background putih.
-    clone.style.background = '#ffffff';
-    // Jika ada elemen di dalamnya yang perlu warna, kita biarkan saja karena CSS tema gelap mungkin ikut,
-    // tapi kita ingin hasil selalu putih terang. Untuk itu, kita bisa set data-theme="light" pada clone?
-    // Tapi karena kita menggunakan class dan variabel CSS, mungkin lebih mudah mengatur agar container memiliki data-theme="light".
-    container.setAttribute('data-theme', 'light'); // paksa tema terang
+    // Paksa tema terang untuk hasil yang konsisten
+    container.setAttribute('data-theme', 'light');
 
     html2canvas(clone, {
-      scale: 1.5,
+      scale: 3, // skala tinggi agar teks tajam
       backgroundColor: '#ffffff',
       logging: false,
       allowTaint: false,
@@ -713,7 +707,7 @@ function captureElementFull(element) {
   });
 }
 
-// ── Download JPG dengan rasio 4:3 (fix full lebar) ──
+// ── Download JPG dengan rasio 4:3 (tanpa penskalaan gambar, tanpa pemotongan) ──
 function downloadJPG() {
   if (scheduleData.length === 0) {
     showToast('❌ Buat jadwal terlebih dahulu');
@@ -726,26 +720,36 @@ function downloadJPG() {
     const origW = canvas.width;
     const origH = canvas.height;
     const targetRatio = 4 / 3;
+
+    // Tentukan ukuran canvas target agar dapat menampung seluruh gambar asli dan memiliki rasio 4:3
     let targetW, targetH;
-    if (origW / origH > targetRatio) {
-      targetH = origH;
-      targetW = targetH * targetRatio;
+    // Coba dengan lebar = max(origW, origH * 4/3)
+    let w1 = Math.max(origW, origH * targetRatio);
+    let h1 = w1 / targetRatio;
+    // Coba dengan tinggi = max(origH, origW / targetRatio)
+    let h2 = Math.max(origH, origW / targetRatio);
+    let w2 = h2 * targetRatio;
+    // Pilih yang lebih besar (agar gambar muat)
+    if (w1 * h1 >= w2 * h2) {
+      targetW = Math.round(w1);
+      targetH = Math.round(h1);
     } else {
-      targetW = origW;
-      targetH = targetW / targetRatio;
+      targetW = Math.round(w2);
+      targetH = Math.round(h2);
     }
-    targetW = Math.round(targetW);
-    targetH = Math.round(targetH);
+
     const finalCanvas = document.createElement('canvas');
     finalCanvas.width = targetW;
     finalCanvas.height = targetH;
     const ctx = finalCanvas.getContext('2d');
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, targetW, targetH);
-    const scale = Math.min(targetW / origW, targetH / origH);
-    const dx = (targetW - origW * scale) / 2;
-    const dy = (targetH - origH * scale) / 2;
-    ctx.drawImage(canvas, 0, 0, origW, origH, dx, dy, origW * scale, origH * scale);
+
+    // Hitung posisi agar gambar di tengah
+    const dx = Math.round((targetW - origW) / 2);
+    const dy = Math.round((targetH - origH) / 2);
+    ctx.drawImage(canvas, dx, dy);
+
     finalCanvas.toBlob(blob => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -761,7 +765,7 @@ function downloadJPG() {
   });
 }
 
-// ── Download PDF dengan rasio 4:3 (fix full lebar) ──
+// ── Download PDF dengan rasio 4:3 (sudah aman) ──
 function downloadPDF() {
   if (scheduleData.length === 0) {
     showToast('❌ Buat jadwal terlebih dahulu');
@@ -779,17 +783,22 @@ function downloadPDF() {
       unit: 'mm',
       format: [pdfW, pdfH]
     });
+
     const imgData = canvas.toDataURL('image/jpeg', 0.95);
     const margin = 5; // mm
     const maxW = pdfW - margin * 2;
     const maxH = pdfH - margin * 2;
-    const imgW = canvas.width;
-    const imgH = canvas.height;
-    const scale = Math.min(maxW / imgW, maxH / imgH);
-    const w = imgW * scale;
-    const h = imgH * scale;
+
+    const origW = canvas.width;
+    const origH = canvas.height;
+
+    // Hitung skala agar gambar muat dalam area dengan margin
+    const scale = Math.min(maxW / origW, maxH / origH);
+    const w = origW * scale;
+    const h = origH * scale;
     const x = (pdfW - w) / 2;
     const y = (pdfH - h) / 2;
+
     pdf.addImage(imgData, 'JPEG', x, y, w, h);
     pdf.save(`Jadwal-${document.getElementById('nama-kelas').value || 'Kelas'}.pdf`);
     showToast('✅ PDF berhasil diunduh!');
