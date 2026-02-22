@@ -218,25 +218,6 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 }
 #toast.show { transform: translateY(0); opacity: 1; }
 
-/* Modal overlay for class name input before download */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.5); z-index: 500;
-  align-items: center; justify-content: center;
-}
-.modal-overlay.open { display: flex; }
-.modal-box {
-  background: var(--surface); border-radius: var(--radius);
-  padding: 28px; max-width: 420px; width: 90%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  animation: popIn 0.25s ease;
-}
-@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.modal-box h3 { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
-.modal-box p { font-size: 0.82rem; color: var(--text2); margin-bottom: 18px; }
-.modal-input { width: 100%; margin-bottom: 16px; font-size: 1rem; font-weight: 600; text-align: center; padding: 12px; }
-.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
-
 /* Print */
 @media print {
   body * { visibility: hidden; }
@@ -281,21 +262,21 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
       <div class="form-row form-row-2">
         <div class="form-group">
           <label class="form-label">Nama Sekolah</label>
-          <input type="text" id="nama-sekolah" placeholder="Contoh: SMP Negeri 1 Semarang" value="SMP Negeri 1 Semarang">
+          <input type="text" id="nama-sekolah" placeholder="SMKN 2 Wonosari" value="SMKN 2 Wonosari">
         </div>
         <div class="form-group">
           <label class="form-label">Nama Kelas</label>
-          <input type="text" id="nama-kelas" placeholder="Contoh: VII E, XI TJKT 3, XII IPA 1" value="VII E">
+          <input type="text" id="nama-kelas" placeholder="Contoh: XI TJKT 3, XI TKL">
         </div>
       </div>
       <div class="form-row form-row-2">
         <div class="form-group">
-          <label class="form-label">Semester & Tahun Pelajaran</label>
-          <input type="text" id="semester" placeholder="Contoh: Semester 1 Tahun 2024/2025" value="Semester 1 Tahun Pelajaran 2024/2025">
+          <label class="form-label">Semester</label>
+          <input type="text" id="semester" placeholder="Contoh: Semester 1 " value="Semester 2">
         </div>
         <div class="form-group">
           <label class="form-label">Tanggal Mulai</label>
-          <input type="text" id="tgl-mulai" placeholder="Contoh: Mulai 15 Juli 2024" value="Mulai 15 Juli 2024">
+          <input type="text" id="tgl-mulai" placeholder="Contoh: Mulai 15 Juli 2024" value="Senin">
         </div>
       </div>
       <div class="form-row">
@@ -355,6 +336,8 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
       </div>
       <div class="export-btns">
         <button class="btn btn-ghost" onclick="showInputSection()">✏️ Edit</button>
+        <button class="btn btn-ghost" onclick="simpanJadwal()">💾 Simpan</button>
+        <button class="btn btn-ghost" onclick="muatJadwal()">📂 Muat</button>
         <button class="btn btn-success" onclick="downloadCSV()">📊 CSV</button>
         <button class="btn btn-warning" onclick="downloadJPG()">🖼️ JPG</button>
         <button class="btn btn-danger" onclick="downloadPDF()">📄 PDF</button>
@@ -389,9 +372,6 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
     </div>
   </div>
 </main>
-
-
-
 
 <div id="toast"></div>
 
@@ -465,7 +445,6 @@ const kodeGuru = {
 
 const HARI = ['Senin','Selasa','Rabu','Kamis','Jumat'];
 let scheduleData = [];
-let pendingDownloadType = null;
 
 // ── Dark mode ──
 document.getElementById('theme-toggle').onclick = () => {
@@ -482,9 +461,9 @@ function buildJamConfig() {
   const wrap = document.getElementById('jam-config-wrap');
   wrap.innerHTML = '';
   const defaults = [
-    '07.00–07.45','07.45–08.30','08.30–09.15','09.15–10.00',
-    '10.00–10.45','10.45–11.30','11.30–12.15','12.15–13.00',
-    '13.00–13.45','13.45–14.30','14.30–15.15','15.15–16.00'
+    '07.30–07.55','07.55–08.20','08.20–08.45','08.45–09.10',
+    '09.10–09.35','09.55–10.20','10.20–10.45','10.45–11.10',
+    '11.10–11.35','11.35–12.00','14.30–15.15','15.15–16.00'
   ];
   for (let i = 0; i < n; i++) {
     wrap.innerHTML += `<div class="jam-item">
@@ -650,251 +629,80 @@ function getSpecialClass(kode) {
   return '';
 }
 
-// ── Modal for download ── (DIHAPUS - tidak pakai modal lagi)
-
+// ── Download JPG dengan rasio 4:3 ──
 function downloadJPG() {
-  showToast('🖼️ Membuat gambar...');
-  setTimeout(() => {
-    const canvas = buildCanvas();
-    canvas.toBlob(blob => {
+  showToast('🖼️ Menyiapkan gambar...');
+  const element = document.getElementById('jadwal-print-area');
+  html2canvas(element, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+    const origW = canvas.width;
+    const origH = canvas.height;
+    const targetRatio = 4 / 3; // 1.333
+    let targetW, targetH;
+    if (origW / origH > targetRatio) {
+      targetH = origH;
+      targetW = targetH * targetRatio;
+    } else {
+      targetW = origW;
+      targetH = targetW / targetRatio;
+    }
+    targetW = Math.round(targetW);
+    targetH = Math.round(targetH);
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = targetW;
+    finalCanvas.height = targetH;
+    const ctx = finalCanvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, targetW, targetH);
+    const scale = Math.min(targetW / origW, targetH / origH);
+    const dx = (targetW - origW * scale) / 2;
+    const dy = (targetH - origH * scale) / 2;
+    ctx.drawImage(canvas, 0, 0, origW, origH, dx, dy, origW * scale, origH * scale);
+    finalCanvas.toBlob(blob => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Jadwal-${document.getElementById('nama-kelas').value||'Kelas'}.jpg`;
+      a.download = `Jadwal-${document.getElementById('nama-kelas').value || 'Kelas'}.jpg`;
       a.click();
       URL.revokeObjectURL(url);
       showToast('✅ JPG berhasil diunduh!');
-    }, 'image/jpeg', 0.97);
-  }, 100);
-}
-
-function downloadPDF() {
-  showToast('📄 Membuat PDF...');
-  setTimeout(() => {
-    const canvas = buildCanvas();
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('l', 'mm', 'a4');
-    const pgW = pdf.internal.pageSize.getWidth();
-    const pgH = pdf.internal.pageSize.getHeight();
-    const ratio = Math.min((pgW - 20) / canvas.width, (pgH - 20) / canvas.height);
-    const w = canvas.width * ratio;
-    const h = canvas.height * ratio;
-    const x = (pgW - w) / 2;
-    const y = (pgH - h) / 2;
-    pdf.addImage(canvas.toDataURL('image/jpeg', 0.97), 'JPEG', x, y, w, h);
-    pdf.save(`Jadwal-${document.getElementById('nama-kelas').value||'Kelas'}.pdf`);
-    showToast('✅ PDF berhasil diunduh!');
-  }, 100);
-}
-
-// ── Build canvas — 4:3 ratio, matches preview visually ──
-function buildCanvas() {
-  const jamPerHari = window._jamPerHari || 10;
-  const jamTimes   = window._jamTimes  || [];
-  const kelas   = document.getElementById('nama-kelas').value   || 'Kelas';
-  const sekolah = document.getElementById('nama-sekolah').value || '';
-  const semester= document.getElementById('semester').value     || '';
-  const tgl     = document.getElementById('tgl-mulai').value    || '';
-  const now     = new Date();
-  const hasTime = jamTimes.some(t => t);
-  const nDays   = scheduleData.length; // 5
-
-  // ── Fixed 4:3 canvas size (1600 × 1200 logical px, ×2 for sharpness) ──
-  const CW = 1600, CH = 1200, SCALE = 2;
-  const canvas = document.createElement('canvas');
-  canvas.width  = CW * SCALE;
-  canvas.height = CH * SCALE;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(SCALE, SCALE);
-
-  // ── Colours matching the preview ──
-  const C = {
-    bg:        '#ffffff',
-    titleSub:  '#555555',
-    titleMain: '#111111',
-    thBg:      '#e8f0fe',   // blue-ish header like preview
-    thText:    '#1a73e8',
-    thBorder:  '#c5d3f5',
-    hariiBg:   '#f5f5f5',
-    hariiText: '#111111',
-    hariiRightBorder: '#888888',
-    cellBg:    '#ffffff',
-    cellBorder:'#c8c8c8',
-    mapelText: '#111111',
-    guruText:  '#555555',
-    emptyBg:   '#fafafa',
-    timeBg:    '#f5f5f5',
-    timeText:  '#888888',
-    footerText:'#aaaaaa',
-    outerBorder:'#333333',
-    // special cell backgrounds (same as CSS)
-    gls:   '#fffde7',
-    upcr:  '#e8f5e9',
-    upacara:'#e8f5e9',
-    bk:    '#fce4ec',
-    krida: '#e3f2fd',
-  };
-
-  const PAD      = 28;   // outer padding
-  const TITLE_H  = 80;   // height of title block
-  const FOOTER_H = 28;
-
-  // Work out table area
-  const tableX = PAD;
-  const tableY = TITLE_H;
-  const tableW = CW - PAD * 2;
-  const tableH = CH - TITLE_H - FOOTER_H - PAD;
-
-  // Column widths — hari col fixed, rest split evenly
-  const HARI_W  = Math.round(tableW * 0.09);  // ~9% for day name
-  const jamColW = Math.round((tableW - HARI_W) / jamPerHari);
-
-  // Row heights — header row + optional time row + data rows
-  const HEADER_H  = 34;
-  const TIME_H    = hasTime ? 20 : 0;
-  const dataAreaH = tableH - HEADER_H - TIME_H;
-  const ROW_H     = Math.round(dataAreaH / nDays);
-
-  // ── White background ──
-  ctx.fillStyle = C.bg;
-  ctx.fillRect(0, 0, CW, CH);
-
-  // ── Title block ──
-  const titleStr = ['Jadwal KBM', sekolah, semester, tgl].filter(Boolean).join('  ·  ');
-  ctx.textAlign    = 'center';
-  ctx.textBaseline = 'alphabetic';
-  ctx.font         = '15px Arial';
-  ctx.fillStyle    = C.titleSub;
-  ctx.fillText(titleStr, CW / 2, PAD + 20);
-
-  ctx.font      = 'bold 38px Arial';
-  ctx.fillStyle = C.titleMain;
-  ctx.fillText(kelas, CW / 2, PAD + 66);
-
-  // ── Helpers ──
-  function rect(x, y, w, h, fill, strokeColor, strokeW) {
-    ctx.fillStyle = fill;
-    ctx.fillRect(x, y, w, h);
-    if (strokeColor) {
-      ctx.strokeStyle = strokeColor;
-      ctx.lineWidth   = strokeW || 1;
-      ctx.strokeRect(x + (strokeW||1)/2, y + (strokeW||1)/2, w - (strokeW||1), h - (strokeW||1));
-    }
-  }
-
-  function text(str, cx, cy, maxW, font, color, align) {
-    ctx.font         = font;
-    ctx.fillStyle    = color;
-    ctx.textAlign    = align || 'center';
-    ctx.textBaseline = 'middle';
-    // Truncate if needed
-    let s = String(str);
-    while (ctx.measureText(s).width > maxW - 6 && s.length > 2) s = s.slice(0, -1);
-    ctx.fillText(s, cx, cy);
-  }
-
-  // ── Header row (jam numbers) ──
-  let hx = tableX, hy = tableY;
-  rect(hx, hy, HARI_W, HEADER_H, C.thBg, C.thBorder);
-  text('Hari', hx + HARI_W/2, hy + HEADER_H/2, HARI_W, 'bold 15px Arial', C.thText);
-  for (let i = 0; i < jamPerHari; i++) {
-    const cx = tableX + HARI_W + i * jamColW;
-    rect(cx, hy, jamColW, HEADER_H, C.thBg, C.thBorder);
-    text(`${i+1}`, cx + jamColW/2, hy + HEADER_H/2, jamColW, 'bold 16px Arial', C.thText);
-  }
-
-  // ── Time sub-row ──
-  let curY = tableY + HEADER_H;
-  if (hasTime) {
-    rect(tableX, curY, HARI_W, TIME_H, C.timeBg, C.cellBorder, 0.5);
-    for (let i = 0; i < jamPerHari; i++) {
-      const cx = tableX + HARI_W + i * jamColW;
-      rect(cx, curY, jamColW, TIME_H, C.timeBg, C.cellBorder, 0.5);
-      text(jamTimes[i]||'', cx + jamColW/2, curY + TIME_H/2, jamColW, '11px monospace', C.timeText);
-    }
-    curY += TIME_H;
-  }
-
-  // ── Data rows ──
-  const BG_SPECIAL = { gls:C.gls, upcr:C.upcr, upacara:C.upacara, bk:C.bk, krida:C.krida };
-
-  scheduleData.forEach((dayData, di) => {
-    const rowY = curY + di * ROW_H;
-
-    // Alternating row bg (even rows very slightly tinted, like preview hover)
-    const rowBase = di % 2 === 1 ? '#f9fbff' : '#ffffff';
-
-    // Parse merged cells for this row
-    const cells = [];
-    let j = 0;
-    const dk = dayData.kodes;
-    while (j < dk.length) {
-      const kode = dk[j];
-      let span = 1;
-      while (j + span < dk.length && dk[j+span] === kode) span++;
-      const info = kodeGuru[kode] || { mapel: kode, nama: '' };
-      cells.push({ kode, mapel: info.mapel, nama: info.nama, span, start: j });
-      j += span;
-    }
-
-    // Day label
-    rect(tableX, rowY, HARI_W, ROW_H, C.hariiBg, C.cellBorder);
-    // Thick right border for hari col
-    ctx.strokeStyle = C.hariiRightBorder;
-    ctx.lineWidth   = 2;
-    ctx.beginPath();
-    ctx.moveTo(tableX + HARI_W, rowY);
-    ctx.lineTo(tableX + HARI_W, rowY + ROW_H);
-    ctx.stroke();
-    text(dayData.hari, tableX + HARI_W/2, rowY + ROW_H/2, HARI_W, 'bold 16px Arial', C.hariiText);
-
-    // Subject cells
-    let col = 0;
-    cells.forEach(cell => {
-      while (col < cell.start) {
-        rect(tableX + HARI_W + col*jamColW, rowY, jamColW, ROW_H, C.emptyBg, C.cellBorder, 0.7);
-        col++;
-      }
-      const cx  = tableX + HARI_W + col * jamColW;
-      const cw  = jamColW * cell.span;
-      const bg  = BG_SPECIAL[cell.kode.toLowerCase()] || rowBase;
-      rect(cx, rowY, cw, ROW_H, bg, C.cellBorder);
-
-      const centerX = cx + cw / 2;
-      if (cell.nama) {
-        // mapel (upper portion) + guru (lower)
-        text(cell.mapel, centerX, rowY + ROW_H * 0.36, cw, 'bold 15px Arial', C.mapelText);
-        text(cell.nama,  centerX, rowY + ROW_H * 0.68, cw, 'italic 12px Arial', C.guruText);
-      } else {
-        text(cell.mapel, centerX, rowY + ROW_H * 0.5, cw, 'bold 15px Arial', C.mapelText);
-      }
-      col += cell.span;
-    });
-
-    // Remaining empty cells
-    while (col < jamPerHari) {
-      rect(tableX + HARI_W + col*jamColW, rowY, jamColW, ROW_H, C.emptyBg, C.cellBorder, 0.7);
-      col++;
-    }
+    }, 'image/jpeg', 0.95);
+  }).catch(err => {
+    console.error(err);
+    showToast('❌ Gagal membuat gambar');
   });
+}
 
-  // ── Outer table border ──
-  const tableBottom = curY + nDays * ROW_H;
-  ctx.strokeStyle = C.outerBorder;
-  ctx.lineWidth   = 2;
-  ctx.strokeRect(tableX + 1, tableY + 1, tableW - 2, tableBottom - tableY - 2);
-
-  // ── Footer ──
-  const footerY = tableBottom + 10;
-  ctx.font         = '13px Arial';
-  ctx.fillStyle    = C.footerText;
-  ctx.textBaseline = 'middle';
-  ctx.textAlign    = 'left';
-  ctx.fillText(`Timetable generated: ${now.toLocaleDateString('id-ID')}`, PAD, footerY + FOOTER_H/2);
-  ctx.textAlign = 'right';
-  ctx.fillText(kelas, CW - PAD, footerY + FOOTER_H/2);
-
-  return canvas;
+// ── Download PDF dengan rasio 4:3 ──
+function downloadPDF() {
+  showToast('📄 Menyiapkan PDF...');
+  const element = document.getElementById('jadwal-print-area');
+  html2canvas(element, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+    const { jsPDF } = window.jspdf;
+    const pdfW = 240; // mm
+    const pdfH = 180; // mm
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [pdfW, pdfH]
+    });
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const margin = 5; // mm
+    const maxW = pdfW - margin * 2;
+    const maxH = pdfH - margin * 2;
+    const imgW = canvas.width;
+    const imgH = canvas.height;
+    const scale = Math.min(maxW / imgW, maxH / imgH);
+    const w = imgW * scale;
+    const h = imgH * scale;
+    const x = (pdfW - w) / 2;
+    const y = (pdfH - h) / 2;
+    pdf.addImage(imgData, 'JPEG', x, y, w, h);
+    pdf.save(`Jadwal-${document.getElementById('nama-kelas').value || 'Kelas'}.pdf`);
+    showToast('✅ PDF berhasil diunduh!');
+  }).catch(err => {
+    console.error(err);
+    showToast('❌ Gagal membuat PDF');
+  });
 }
 
 function downloadCSV() {
@@ -942,7 +750,52 @@ function loadContoh() {
     'D4 D4 D4 T3 S1 S1 T3 T3 G1 G1 ' +
     'Krida Krida Krida W1 W1 W1 R1 R1 R1';
   document.getElementById('kodes').dispatchEvent(new Event('input'));
-  showToast('📋 Contoh data VII E dimuat!');
+  showToast('📋 Contoh data dimuat!');
+}
+
+// ── Fitur Simpan ke localStorage ──
+function simpanJadwal() {
+  const data = {
+    sekolah: document.getElementById('nama-sekolah').value,
+    kelas: document.getElementById('nama-kelas').value,
+    semester: document.getElementById('semester').value,
+    tgl: document.getElementById('tgl-mulai').value,
+    jamPerHari: document.getElementById('jam-per-hari').value,
+    jamTimes: [],
+    kodes: document.getElementById('kodes').value
+  };
+  for (let i = 1; i <= data.jamPerHari; i++) {
+    const el = document.getElementById(`jt-${i}`);
+    if (el) data.jamTimes.push(el.value);
+  }
+  localStorage.setItem('jadwalData', JSON.stringify(data));
+  showToast('✅ Jadwal tersimpan!');
+}
+
+function muatJadwal() {
+  const saved = localStorage.getItem('jadwalData');
+  if (!saved) { showToast('❌ Tidak ada data tersimpan'); return; }
+  try {
+    const data = JSON.parse(saved);
+    document.getElementById('nama-sekolah').value = data.sekolah || '';
+    document.getElementById('nama-kelas').value = data.kelas || '';
+    document.getElementById('semester').value = data.semester || '';
+    document.getElementById('tgl-mulai').value = data.tgl || '';
+    document.getElementById('jam-per-hari').value = data.jamPerHari || 10;
+    buildJamConfig();
+    if (data.jamTimes && Array.isArray(data.jamTimes)) {
+      for (let i = 0; i < data.jamTimes.length; i++) {
+        const el = document.getElementById(`jt-${i+1}`);
+        if (el) el.value = data.jamTimes[i];
+      }
+    }
+    document.getElementById('kodes').value = data.kodes || '';
+    document.getElementById('kodes').dispatchEvent(new Event('input'));
+    generateJadwal();
+    showToast('✅ Jadwal dimuat!');
+  } catch (e) {
+    showToast('❌ Gagal memuat data');
+  }
 }
 
 // ── Toast ──

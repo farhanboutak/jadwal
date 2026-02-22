@@ -218,25 +218,6 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 }
 #toast.show { transform: translateY(0); opacity: 1; }
 
-/* Modal overlay for class name input before download */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.5); z-index: 500;
-  align-items: center; justify-content: center;
-}
-.modal-overlay.open { display: flex; }
-.modal-box {
-  background: var(--surface); border-radius: var(--radius);
-  padding: 28px; max-width: 420px; width: 90%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  animation: popIn 0.25s ease;
-}
-@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.modal-box h3 { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
-.modal-box p { font-size: 0.82rem; color: var(--text2); margin-bottom: 18px; }
-.modal-input { width: 100%; margin-bottom: 16px; font-size: 1rem; font-weight: 600; text-align: center; padding: 12px; }
-.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
-
 /* Print */
 @media print {
   body * { visibility: hidden; }
@@ -355,6 +336,8 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
       </div>
       <div class="export-btns">
         <button class="btn btn-ghost" onclick="showInputSection()">✏️ Edit</button>
+        <button class="btn btn-ghost" onclick="simpanJadwal()">💾 Simpan</button>
+        <button class="btn btn-ghost" onclick="muatJadwal()">📂 Muat</button>
         <button class="btn btn-success" onclick="downloadCSV()">📊 CSV</button>
         <button class="btn btn-warning" onclick="downloadJPG()">🖼️ JPG</button>
         <button class="btn btn-danger" onclick="downloadPDF()">📄 PDF</button>
@@ -389,9 +372,6 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
     </div>
   </div>
 </main>
-
-
-
 
 <div id="toast"></div>
 
@@ -465,7 +445,6 @@ const kodeGuru = {
 
 const HARI = ['Senin','Selasa','Rabu','Kamis','Jumat'];
 let scheduleData = [];
-let pendingDownloadType = null;
 
 // ── Dark mode ──
 document.getElementById('theme-toggle').onclick = () => {
@@ -650,228 +629,80 @@ function getSpecialClass(kode) {
   return '';
 }
 
-// ── Modal for download ── (DIHAPUS - tidak pakai modal lagi)
-
+// ── Download JPG dengan rasio 4:3 ──
 function downloadJPG() {
-  showToast('🖼️ Membuat gambar...');
-  setTimeout(() => {
-    const canvas = buildCanvas();
-    canvas.toBlob(blob => {
+  showToast('🖼️ Menyiapkan gambar...');
+  const element = document.getElementById('jadwal-print-area');
+  html2canvas(element, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+    const origW = canvas.width;
+    const origH = canvas.height;
+    const targetRatio = 4 / 3; // 1.333
+    let targetW, targetH;
+    if (origW / origH > targetRatio) {
+      targetH = origH;
+      targetW = targetH * targetRatio;
+    } else {
+      targetW = origW;
+      targetH = targetW / targetRatio;
+    }
+    targetW = Math.round(targetW);
+    targetH = Math.round(targetH);
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = targetW;
+    finalCanvas.height = targetH;
+    const ctx = finalCanvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, targetW, targetH);
+    const scale = Math.min(targetW / origW, targetH / origH);
+    const dx = (targetW - origW * scale) / 2;
+    const dy = (targetH - origH * scale) / 2;
+    ctx.drawImage(canvas, 0, 0, origW, origH, dx, dy, origW * scale, origH * scale);
+    finalCanvas.toBlob(blob => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Jadwal-${document.getElementById('nama-kelas').value||'Kelas'}.jpg`;
+      a.download = `Jadwal-${document.getElementById('nama-kelas').value || 'Kelas'}.jpg`;
       a.click();
       URL.revokeObjectURL(url);
       showToast('✅ JPG berhasil diunduh!');
-    }, 'image/jpeg', 0.97);
-  }, 100);
-}
-
-function downloadPDF() {
-  showToast('📄 Membuat PDF...');
-  setTimeout(() => {
-    const canvas = buildCanvas();
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('l', 'mm', 'a4');
-    const pgW = pdf.internal.pageSize.getWidth();
-    const pgH = pdf.internal.pageSize.getHeight();
-    const ratio = Math.min((pgW - 20) / canvas.width, (pgH - 20) / canvas.height);
-    const w = canvas.width * ratio;
-    const h = canvas.height * ratio;
-    const x = (pgW - w) / 2;
-    const y = (pgH - h) / 2;
-    pdf.addImage(canvas.toDataURL('image/jpeg', 0.97), 'JPEG', x, y, w, h);
-    pdf.save(`Jadwal-${document.getElementById('nama-kelas').value||'Kelas'}.pdf`);
-    showToast('✅ PDF berhasil diunduh!');
-  }, 100);
-}
-
-// ── Build canvas directly (no html2canvas, no CORS issues) ──
-function buildCanvas() {
-  const jamPerHari = window._jamPerHari || 10;
-  const jamTimes = window._jamTimes || [];
-  const kelas = document.getElementById('nama-kelas').value || 'Kelas';
-  const sekolah = document.getElementById('nama-sekolah').value || '';
-  const semester = document.getElementById('semester').value || '';
-  const tgl = document.getElementById('tgl-mulai').value || '';
-  const now = new Date();
-
-  // ── Layout constants ──
-  const SCALE = 3;
-  const COL_HARI_W = 80;
-  const COL_W = 88;
-  const ROW_H = 56;
-  const TIME_ROW_H = 18;
-  const HEADER_ROW_H = 32;
-  const TITLE_H = 70;
-  const FOOTER_H = 24;
-  const PAD = 20;
-
-  const hasTime = jamTimes.some(t => t);
-  const totalCols = 1 + jamPerHari; // hari + jam cols
-  const totalW = PAD * 2 + COL_HARI_W + COL_W * jamPerHari;
-
-  // Count rows
-  let totalRows = 0;
-  scheduleData.forEach(() => { totalRows += 1; if (hasTime) totalRows++; });
-  const totalH = TITLE_H + HEADER_ROW_H + (hasTime ? TIME_ROW_H : 0) + ROW_H * scheduleData.length + (hasTime ? TIME_ROW_H * scheduleData.length : 0) + FOOTER_H + PAD * 2;
-
-  const canvas = document.createElement('canvas');
-  canvas.width = totalW * SCALE;
-  canvas.height = totalH * SCALE;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(SCALE, SCALE);
-
-  // Background
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, totalW, totalH);
-
-  // ── Title ──
-  const titleStr = ['Jadwal KBM', sekolah, semester, tgl].filter(Boolean).join(' · ');
-  ctx.fillStyle = '#444';
-  ctx.font = '11px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText(titleStr, totalW / 2, PAD + 18);
-
-  ctx.fillStyle = '#111';
-  ctx.font = 'bold 28px Arial';
-  ctx.fillText(kelas, totalW / 2, PAD + 52);
-
-  // ── Table start ──
-  let startX = PAD;
-  let startY = TITLE_H;
-
-  // Helper: draw rect with fill + border
-  function drawCell(x, y, w, h, bg, border = '#aaa', borderW = 1) {
-    ctx.fillStyle = bg;
-    ctx.fillRect(x, y, w, h);
-    ctx.strokeStyle = border;
-    ctx.lineWidth = borderW;
-    ctx.strokeRect(x + borderW/2, y + borderW/2, w - borderW, h - borderW);
-  }
-
-  function drawText(text, x, y, w, h, font, color, align = 'center') {
-    ctx.font = font;
-    ctx.fillStyle = color;
-    ctx.textAlign = align;
-    ctx.textBaseline = 'middle';
-    const tx = align === 'center' ? x + w / 2 : x + 6;
-    ctx.fillText(text, tx, y + h / 2, w - 8);
-  }
-
-  // Header row: jam numbers
-  drawCell(startX, startY, COL_HARI_W, HEADER_ROW_H, '#f0f0f0', '#888', 1);
-  drawText('Hari', startX, startY, COL_HARI_W, HEADER_ROW_H, 'bold 12px Arial', '#333');
-
-  for (let i = 0; i < jamPerHari; i++) {
-    const cx = startX + COL_HARI_W + i * COL_W;
-    drawCell(cx, startY, COL_W, HEADER_ROW_H, '#f0f0f0', '#888', 1);
-    drawText(`${i + 1}`, cx, startY, COL_W, HEADER_ROW_H, 'bold 13px Arial', '#222');
-  }
-
-  let curY = startY + HEADER_ROW_H;
-
-  // Time sub-header (if defined)
-  if (hasTime) {
-    drawCell(startX, curY, COL_HARI_W, TIME_ROW_H, '#f9f9f9', '#ccc', 0.5);
-    for (let i = 0; i < jamPerHari; i++) {
-      const cx = startX + COL_HARI_W + i * COL_W;
-      drawCell(cx, curY, COL_W, TIME_ROW_H, '#f9f9f9', '#ccc', 0.5);
-      drawText(jamTimes[i] || '', cx, curY, COL_W, TIME_ROW_H, '9px monospace', '#888');
-    }
-    curY += TIME_ROW_H;
-  }
-
-  // Data rows
-  const BG_SPECIAL = {
-    gls: '#fffde7', upcr: '#e8f5e9', upacara: '#e8f5e9',
-    bk: '#fce4ec', krida: '#e3f2fd'
-  };
-
-  scheduleData.forEach(dayData => {
-    // Parse merged cells
-    const cells = [];
-    let j = 0;
-    const dk = dayData.kodes;
-    while (j < dk.length) {
-      const kode = dk[j];
-      let span = 1;
-      while (j + span < dk.length && dk[j + span] === kode) span++;
-      const info = kodeGuru[kode] || { mapel: kode, nama: '' };
-      cells.push({ kode, mapel: info.mapel, nama: info.nama, span, start: j });
-      j += span;
-    }
-
-    // Day label cell
-    drawCell(startX, curY, COL_HARI_W, ROW_H, '#f5f5f5', '#999', 1);
-    // Bold right border for day col
-    ctx.strokeStyle = '#777';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(startX + COL_HARI_W, curY);
-    ctx.lineTo(startX + COL_HARI_W, curY + ROW_H);
-    ctx.stroke();
-
-    drawText(dayData.hari, startX, curY, COL_HARI_W, ROW_H, 'bold 13px Arial', '#111');
-
-    // Subject cells
-    let col = 0;
-    cells.forEach(cell => {
-      // Empty gap before
-      while (col < cell.start) {
-        const cx = startX + COL_HARI_W + col * COL_W;
-        drawCell(cx, curY, COL_W, ROW_H, '#fafafa', '#ddd', 0.8);
-        col++;
-      }
-      const cx = startX + COL_HARI_W + col * COL_W;
-      const cw = COL_W * cell.span;
-      const bg = BG_SPECIAL[cell.kode.toLowerCase()] || '#ffffff';
-      drawCell(cx, curY, cw, ROW_H, bg, '#aaa', 1);
-
-      // Mapel text
-      const midY = curY + (cell.nama ? ROW_H * 0.38 : ROW_H * 0.5);
-      ctx.font = 'bold 12px Arial';
-      ctx.fillStyle = '#111';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(cell.mapel, cx + cw / 2, midY, cw - 8);
-
-      // Guru name
-      if (cell.nama) {
-        ctx.font = 'italic 10px Arial';
-        ctx.fillStyle = '#555';
-        ctx.fillText(cell.nama, cx + cw / 2, curY + ROW_H * 0.68, cw - 8);
-      }
-
-      col += cell.span;
-    });
-
-    // Remaining empty cells
-    while (col < jamPerHari) {
-      const cx = startX + COL_HARI_W + col * COL_W;
-      drawCell(cx, curY, COL_W, ROW_H, '#fafafa', '#ddd', 0.8);
-      col++;
-    }
-
-    curY += ROW_H;
+    }, 'image/jpeg', 0.95);
+  }).catch(err => {
+    console.error(err);
+    showToast('❌ Gagal membuat gambar');
   });
+}
 
-  // Outer border
-  ctx.strokeStyle = '#333';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(startX + 1, startY + 1, totalW - PAD * 2 - 2, curY - startY - 2);
-
-  // Footer
-  ctx.font = '10px Arial';
-  ctx.fillStyle = '#999';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(`Timetable generated: ${now.toLocaleDateString('id-ID')}`, PAD, curY + FOOTER_H / 2);
-  ctx.textAlign = 'right';
-  ctx.fillText(kelas, totalW - PAD, curY + FOOTER_H / 2);
-
-  return canvas;
+// ── Download PDF dengan rasio 4:3 ──
+function downloadPDF() {
+  showToast('📄 Menyiapkan PDF...');
+  const element = document.getElementById('jadwal-print-area');
+  html2canvas(element, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+    const { jsPDF } = window.jspdf;
+    const pdfW = 240; // mm
+    const pdfH = 180; // mm
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: [pdfW, pdfH]
+    });
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const margin = 5; // mm
+    const maxW = pdfW - margin * 2;
+    const maxH = pdfH - margin * 2;
+    const imgW = canvas.width;
+    const imgH = canvas.height;
+    const scale = Math.min(maxW / imgW, maxH / imgH);
+    const w = imgW * scale;
+    const h = imgH * scale;
+    const x = (pdfW - w) / 2;
+    const y = (pdfH - h) / 2;
+    pdf.addImage(imgData, 'JPEG', x, y, w, h);
+    pdf.save(`Jadwal-${document.getElementById('nama-kelas').value || 'Kelas'}.pdf`);
+    showToast('✅ PDF berhasil diunduh!');
+  }).catch(err => {
+    console.error(err);
+    showToast('❌ Gagal membuat PDF');
+  });
 }
 
 function downloadCSV() {
@@ -920,6 +751,51 @@ function loadContoh() {
     'Krida Krida Krida W1 W1 W1 R1 R1 R1';
   document.getElementById('kodes').dispatchEvent(new Event('input'));
   showToast('📋 Contoh data dimuat!');
+}
+
+// ── Fitur Simpan ke localStorage ──
+function simpanJadwal() {
+  const data = {
+    sekolah: document.getElementById('nama-sekolah').value,
+    kelas: document.getElementById('nama-kelas').value,
+    semester: document.getElementById('semester').value,
+    tgl: document.getElementById('tgl-mulai').value,
+    jamPerHari: document.getElementById('jam-per-hari').value,
+    jamTimes: [],
+    kodes: document.getElementById('kodes').value
+  };
+  for (let i = 1; i <= data.jamPerHari; i++) {
+    const el = document.getElementById(`jt-${i}`);
+    if (el) data.jamTimes.push(el.value);
+  }
+  localStorage.setItem('jadwalData', JSON.stringify(data));
+  showToast('✅ Jadwal tersimpan!');
+}
+
+function muatJadwal() {
+  const saved = localStorage.getItem('jadwalData');
+  if (!saved) { showToast('❌ Tidak ada data tersimpan'); return; }
+  try {
+    const data = JSON.parse(saved);
+    document.getElementById('nama-sekolah').value = data.sekolah || '';
+    document.getElementById('nama-kelas').value = data.kelas || '';
+    document.getElementById('semester').value = data.semester || '';
+    document.getElementById('tgl-mulai').value = data.tgl || '';
+    document.getElementById('jam-per-hari').value = data.jamPerHari || 10;
+    buildJamConfig();
+    if (data.jamTimes && Array.isArray(data.jamTimes)) {
+      for (let i = 0; i < data.jamTimes.length; i++) {
+        const el = document.getElementById(`jt-${i+1}`);
+        if (el) el.value = data.jamTimes[i];
+      }
+    }
+    document.getElementById('kodes').value = data.kodes || '';
+    document.getElementById('kodes').dispatchEvent(new Event('input'));
+    generateJadwal();
+    showToast('✅ Jadwal dimuat!');
+  } catch (e) {
+    showToast('❌ Gagal memuat data');
+  }
 }
 
 // ── Toast ──
