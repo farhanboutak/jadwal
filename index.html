@@ -61,7 +61,7 @@ header {
 .btn-danger:hover { opacity: 0.88; }
 
 /* Main */
-main { max-width: 1200px; margin: 0 auto; padding: 28px 20px; } /* Lebar maksimal diperbesar */
+main { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
 
 /* Card */
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 24px; }
@@ -160,7 +160,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 .sched-grid-wrap { overflow-x: auto; }
 .sched-grid {
   width: 100%; border-collapse: collapse;
-  font-size: 1rem; /* lebih besar dari sebelumnya */
+  font-size: 1rem;
   min-width: 800px;
   border: 2px solid #222;
 }
@@ -169,7 +169,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   border: 1px solid #888;
   text-align: center;
   vertical-align: middle;
-  padding: 12px 8px; /* padding lebih besar */
+  padding: 12px 8px;
 }
 [data-theme="dark"] .sched-grid th, [data-theme="dark"] .sched-grid td { border-color: #475569; }
 
@@ -218,7 +218,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 [data-theme="dark"] .cell-bk { background: #3a1a2a; }
 [data-theme="dark"] .cell-krida { background: #1a2a3a; }
 
-/* Time row (lebih besar juga) */
+/* Time row */
 .time-row td {
   font-size: 0.8rem; color: #666; background: #f9f9f9;
   padding: 6px 4px; border-top: none;
@@ -233,13 +233,13 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   padding: 0 4px;
 }
 
-/* Dynamic font size classes (akan diatur via JS) */
+/* Dynamic font size classes */
 .sched-grid.font-small { font-size: 0.8rem; }
 .sched-grid.font-small .col-hari { font-size: 0.9rem; }
 .sched-grid.font-small .cell-mapel .mapel { font-size: 0.85rem; }
 .sched-grid.font-small .cell-mapel .guru { font-size: 0.7rem; }
 
-.sched-grid.font-medium { font-size: 1rem; } /* default */
+.sched-grid.font-medium { font-size: 1rem; }
 .sched-grid.font-medium .col-hari { font-size: 1.1rem; }
 .sched-grid.font-medium .cell-mapel .mapel { font-size: 1rem; }
 .sched-grid.font-medium .cell-mapel .guru { font-size: 0.8rem; }
@@ -383,7 +383,9 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
         <button class="btn btn-ghost" onclick="showInputSection()">✏️ Edit</button>
         <button class="btn btn-ghost" onclick="simpanJadwal()">💾 Simpan</button>
         <button class="btn btn-ghost" onclick="muatJadwal()">📂 Muat</button>
-        <!-- Tombol Link baru -->
+        <!-- Tombol Histori -->
+        <button class="btn btn-ghost" onclick="tampilkanHistori()">📜 Histori</button>
+        <!-- Tombol Link -->
         <button class="btn btn-ghost" onclick="getShareLink()">🔗 Link</button>
         <button class="btn btn-success" onclick="downloadCSV()">📊 CSV</button>
         <button class="btn btn-warning" onclick="downloadJPG()">🖼️ JPG</button>
@@ -435,6 +437,146 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 </main>
 
 <div id="toast"></div>
+
+<!-- Modal Histori -->
+<div id="histori-modal" class="modal">
+  <div class="modal-content" style="max-width:500px;">
+    <span class="close-btn" onclick="closeHistoriModal()">&times;</span>
+    <div class="modal-body">
+      <h3 style="margin-bottom:16px;">📜 Histori Jadwal</h3>
+      <div id="histori-list" style="max-height:300px; overflow-y:auto; margin-bottom:16px;"></div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="clearHistori()">Hapus Semua</button>
+        <button class="btn btn-primary" onclick="closeHistoriModal()">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Popup Marhaban ya Ramadhan -->
+<div id="ramadhan-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <div class="modal-body">
+      <span class="modal-icon">🌙</span>
+      <h2>Marhaban ya Ramadhan</h2>
+      <p>Selamat menunaikan ibadah puasa. Semoga bulan suci ini membawa berkah.</p>
+      <button class="btn btn-primary" onclick="closeModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s;
+}
+
+.modal-content {
+  background: var(--surface);
+  border-radius: var(--radius);
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  animation: slideUp 0.3s;
+}
+
+.modal-body {
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.modal-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.modal h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.modal p {
+  color: var(--text2);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.close-btn {
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 8px 16px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: var(--accent);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Item histori */
+.histori-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.histori-item:last-child { border-bottom: none; }
+.histori-info {
+  flex: 1;
+  cursor: pointer;
+}
+.histori-info:hover {
+  background: var(--surface2);
+}
+.histori-judul {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.histori-tanggal {
+  font-size: 0.7rem;
+  color: var(--text2);
+}
+.histori-actions {
+  display: flex;
+  gap: 8px;
+}
+.histori-actions button {
+  padding: 4px 8px;
+  font-size: 0.7rem;
+}
+</style>
 
 <script>
 // ==================  KODE GURU ==================
@@ -641,6 +783,9 @@ function generateJadwal() {
   document.getElementById('output-section').style.display = 'block';
   document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
   showToast('✅ Jadwal berhasil dibuat!');
+
+  // Simpan ke histori setelah berhasil generate
+  simpanKeHistori();
 }
 
 function updatePrintHeader() {
@@ -953,7 +1098,7 @@ function loadContoh() {
   showToast('📋 Contoh data mirip foto dimuat!');
 }
 
-// ── Fitur Simpan ke localStorage ──
+// ── Fitur Simpan ke localStorage (satu data) ──
 function simpanJadwal() {
   const data = {
     sekolah: document.getElementById('nama-sekolah').value,
@@ -995,6 +1140,123 @@ function muatJadwal() {
     showToast('✅ Jadwal dimuat!');
   } catch (e) {
     showToast('❌ Gagal memuat data');
+  }
+}
+
+// === FITUR HISTORI ===
+const HISTORI_KEY = 'jadwalHistori';
+const MAX_HISTORI = 10;
+
+// Ambil histori dari localStorage
+function getHistori() {
+  const stored = localStorage.getItem(HISTORI_KEY);
+  return stored ? JSON.parse(stored) : [];
+}
+
+// Simpan histori (array) ke localStorage
+function setHistori(arr) {
+  localStorage.setItem(HISTORI_KEY, JSON.stringify(arr));
+}
+
+// Tambahkan jadwal saat ini ke histori
+function simpanKeHistori() {
+  const data = {
+    sekolah: document.getElementById('nama-sekolah').value,
+    kelas: document.getElementById('nama-kelas').value,
+    semester: document.getElementById('semester').value,
+    tgl: document.getElementById('tgl-mulai').value,
+    jamPerHari: document.getElementById('jam-per-hari').value,
+    jamTimes: [],
+    kodes: document.getElementById('kodes').value
+  };
+  for (let i = 1; i <= data.jamPerHari; i++) {
+    const el = document.getElementById(`jt-${i}`);
+    if (el) data.jamTimes.push(el.value);
+  }
+
+  const histori = getHistori();
+  const timestamp = new Date().toLocaleString('id-ID');
+  const newItem = {
+    timestamp,
+    label: `${data.kelas || 'Kelas'} - ${data.sekolah || 'Tanpa Sekolah'} (${timestamp})`,
+    data: data
+  };
+  histori.unshift(newItem); // tambahkan di awal (terbaru)
+  if (histori.length > MAX_HISTORI) histori.pop(); // batasi jumlah
+  setHistori(histori);
+  showToast('📜 Jadwal tersimpan di histori');
+}
+
+// Tampilkan modal histori
+function tampilkanHistori() {
+  const histori = getHistori();
+  const listDiv = document.getElementById('histori-list');
+  if (histori.length === 0) {
+    listDiv.innerHTML = '<p style="text-align:center; color:var(--text2);">Belum ada histori.</p>';
+  } else {
+    let html = '';
+    histori.forEach((item, index) => {
+      html += `
+        <div class="histori-item">
+          <div class="histori-info" onclick="muatDariHistori(${index})">
+            <div class="histori-judul">${item.label}</div>
+            <div class="histori-tanggal">${item.timestamp}</div>
+          </div>
+          <div class="histori-actions">
+            <button class="btn btn-ghost" style="padding:4px 8px;" onclick="hapusItemHistori(${index}); event.stopPropagation();">🗑️</button>
+          </div>
+        </div>
+      `;
+    });
+    listDiv.innerHTML = html;
+  }
+  document.getElementById('histori-modal').style.display = 'flex';
+}
+
+function closeHistoriModal() {
+  document.getElementById('histori-modal').style.display = 'none';
+}
+
+// Muat data dari histori berdasarkan index
+function muatDariHistori(index) {
+  const histori = getHistori();
+  if (!histori[index]) return;
+  const data = histori[index].data;
+  // Isi form
+  document.getElementById('nama-sekolah').value = data.sekolah || '';
+  document.getElementById('nama-kelas').value = data.kelas || '';
+  document.getElementById('semester').value = data.semester || '';
+  document.getElementById('tgl-mulai').value = data.tgl || '';
+  document.getElementById('jam-per-hari').value = data.jamPerHari || 10;
+  buildJamConfig();
+  if (data.jamTimes && Array.isArray(data.jamTimes)) {
+    for (let i = 0; i < data.jamTimes.length; i++) {
+      const el = document.getElementById(`jt-${i+1}`);
+      if (el) el.value = data.jamTimes[i];
+    }
+  }
+  document.getElementById('kodes').value = data.kodes || '';
+  document.getElementById('kodes').dispatchEvent(new Event('input'));
+  generateJadwal();
+  closeHistoriModal();
+  showToast('📜 Histori dimuat');
+}
+
+// Hapus satu item histori
+function hapusItemHistori(index) {
+  const histori = getHistori();
+  histori.splice(index, 1);
+  setHistori(histori);
+  tampilkanHistori(); // refresh tampilan modal
+  showToast('Item histori dihapus');
+}
+
+// Hapus semua histori
+function clearHistori() {
+  if (confirm('Hapus semua histori?')) {
+    setHistori([]);
+    closeHistoriModal();
+    showToast('Semua histori dihapus');
   }
 }
 
@@ -1053,84 +1315,6 @@ function showToast(msg) {
     </div>
   </div>
 </div>
-
-<style>
-/* Modal styling */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed;
-  z-index: 10000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.3s;
-}
-
-.modal-content {
-  background: var(--surface);
-  border-radius: var(--radius);
-  max-width: 400px;
-  width: 90%;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  animation: slideUp 0.3s;
-}
-
-.modal-body {
-  padding: 32px 24px;
-  text-align: center;
-}
-
-.modal-icon {
-  font-size: 3rem;
-  display: block;
-  margin-bottom: 16px;
-}
-
-.modal h2 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 12px;
-}
-
-.modal p {
-  color: var(--text2);
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-
-.close-btn {
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  color: var(--text2);
-  cursor: pointer;
-  padding: 8px 16px;
-  line-height: 1;
-  transition: color 0.2s;
-}
-
-.close-btn:hover {
-  color: var(--accent);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-</style>
 
 <script>
 function showModal() {
