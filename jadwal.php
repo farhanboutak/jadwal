@@ -672,7 +672,48 @@ function getSpecialClass(kode) {
   return '';
 }
 
-// ── Download JPG dengan rasio 4:3 (fix potong di HP) ──
+// === FUNGSI CAPTURE DENGAN CLONE (SOLUSI FULL LEBAR) ===
+function captureElementFull(element) {
+  return new Promise((resolve, reject) => {
+    // Clone elemen
+    const clone = element.cloneNode(true);
+    // Buat container sementara di luar layar
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    container.style.width = 'max-content';  // selebar konten
+    container.style.height = 'auto';
+    container.style.zIndex = '-1000';
+    container.appendChild(clone);
+    document.body.appendChild(container);
+
+    // Pastikan elemen clone memiliki latar belakang putih (karena aslinya bisa mengikuti tema)
+    // Tapi lebih baik kita set di sini karena clone mewarisi class, jadi CSS sudah mengatur.
+    // Namun untuk amannya, kita bisa paksa background putih.
+    clone.style.background = '#ffffff';
+    // Jika ada elemen di dalamnya yang perlu warna, kita biarkan saja karena CSS tema gelap mungkin ikut,
+    // tapi kita ingin hasil selalu putih terang. Untuk itu, kita bisa set data-theme="light" pada clone?
+    // Tapi karena kita menggunakan class dan variabel CSS, mungkin lebih mudah mengatur agar container memiliki data-theme="light".
+    container.setAttribute('data-theme', 'light'); // paksa tema terang
+
+    html2canvas(clone, {
+      scale: 1.5,
+      backgroundColor: '#ffffff',
+      logging: false,
+      allowTaint: false,
+      useCORS: true
+    }).then(canvas => {
+      document.body.removeChild(container);
+      resolve(canvas);
+    }).catch(err => {
+      document.body.removeChild(container);
+      reject(err);
+    });
+  });
+}
+
+// ── Download JPG dengan rasio 4:3 (fix full lebar) ──
 function downloadJPG() {
   if (scheduleData.length === 0) {
     showToast('❌ Buat jadwal terlebih dahulu');
@@ -680,18 +721,8 @@ function downloadJPG() {
   }
   showToast('🖼️ Menyiapkan gambar...');
   const element = document.getElementById('jadwal-print-area');
-  // Simpan style asli
-  const originalWidth = element.style.width;
-  const originalMaxWidth = element.style.maxWidth;
-  // Set agar elemen selebar kontennya (untuk menghindari pemotongan)
-  element.style.width = 'max-content';
-  element.style.maxWidth = 'none';
   
-  html2canvas(element, { scale: 1.5, backgroundColor: '#ffffff', logging: false, allowTaint: false, useCORS: true }).then(canvas => {
-    // Kembalikan style
-    element.style.width = originalWidth;
-    element.style.maxWidth = originalMaxWidth;
-    
+  captureElementFull(element).then(canvas => {
     const origW = canvas.width;
     const origH = canvas.height;
     const targetRatio = 4 / 3;
@@ -725,15 +756,12 @@ function downloadJPG() {
       showToast('✅ JPG berhasil diunduh!');
     }, 'image/jpeg', 0.95);
   }).catch(err => {
-    // Kembalikan style meskipun error
-    element.style.width = originalWidth;
-    element.style.maxWidth = originalMaxWidth;
     console.error(err);
     showToast('❌ Gagal membuat gambar');
   });
 }
 
-// ── Download PDF dengan rasio 4:3 (fix potong di HP) ──
+// ── Download PDF dengan rasio 4:3 (fix full lebar) ──
 function downloadPDF() {
   if (scheduleData.length === 0) {
     showToast('❌ Buat jadwal terlebih dahulu');
@@ -741,18 +769,8 @@ function downloadPDF() {
   }
   showToast('📄 Menyiapkan PDF...');
   const element = document.getElementById('jadwal-print-area');
-  // Simpan style asli
-  const originalWidth = element.style.width;
-  const originalMaxWidth = element.style.maxWidth;
-  // Set agar elemen selebar kontennya
-  element.style.width = 'max-content';
-  element.style.maxWidth = 'none';
   
-  html2canvas(element, { scale: 1.5, backgroundColor: '#ffffff', logging: false, allowTaint: false, useCORS: true }).then(canvas => {
-    // Kembalikan style
-    element.style.width = originalWidth;
-    element.style.maxWidth = originalMaxWidth;
-    
+  captureElementFull(element).then(canvas => {
     const { jsPDF } = window.jspdf;
     const pdfW = 240; // mm
     const pdfH = 180; // mm
@@ -776,8 +794,6 @@ function downloadPDF() {
     pdf.save(`Jadwal-${document.getElementById('nama-kelas').value || 'Kelas'}.pdf`);
     showToast('✅ PDF berhasil diunduh!');
   }).catch(err => {
-    element.style.width = originalWidth;
-    element.style.maxWidth = originalMaxWidth;
     console.error(err);
     showToast('❌ Gagal membuat PDF');
   });
