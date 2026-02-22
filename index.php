@@ -102,6 +102,11 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 .jam-item label { font-size: 0.72rem; font-weight: 600; color: var(--text2); }
 .jam-item input { padding: 7px 10px; font-size: 0.78rem; }
 
+/* Checkbox clear jam */
+.clear-jam-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.clear-jam-wrapper input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+.clear-jam-wrapper label { font-size: 0.85rem; font-weight: 500; color: var(--text); cursor: pointer; }
+
 /* Output Section */
 #output-section { display: none; }
 .output-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
@@ -256,7 +261,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   <div class="card" id="step1-card">
     <div class="card-header">
       <span class="card-header-icon">🏫</span>
-      <div><h2>Informasi Jadwal</h2><p>Isi identitas sekolah dan kelas</p></div>
+      <div><h2>Informasi Jadwal</h2><p>Isi identitas sekolah dan kelas (kosongkan jika tidak ingin ditampilkan)</p></div>
     </div>
     <div class="card-body">
       <div class="form-row form-row-2">
@@ -276,7 +281,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
         </div>
         <div class="form-group">
           <label class="form-label">Tanggal Mulai</label>
-          <input type="text" id="tgl-mulai" placeholder="Contoh: Mulai 15 Juli 2024" value="Senin">
+          <input type="text" id="tgl-mulai" placeholder="Kosongkan kalau tidak ingin ditampilkan">
         </div>
       </div>
       <div class="form-row">
@@ -296,6 +301,11 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
       <div><h2>Waktu Jam Pelajaran</h2><p>Opsional — isi waktu tiap jam untuk ditampilkan di jadwal</p></div>
     </div>
     <div class="card-body">
+      <!-- Checkbox untuk mengosongkan semua jam -->
+      <div class="clear-jam-wrapper">
+        <input type="checkbox" id="clear-jam-checkbox">
+        <label for="clear-jam-checkbox">Kosongkan semua jam (sembunyikan waktu)</label>
+      </div>
       <div class="jam-config" id="jam-config-wrap"></div>
       <p class="form-hint" style="margin-top:12px;">💡 Kosongkan jika tidak ingin menampilkan waktu.</p>
     </div>
@@ -445,6 +455,7 @@ const kodeGuru = {
 
 const HARI = ['Senin','Selasa','Rabu','Kamis','Jumat'];
 let scheduleData = [];
+let defaultJamTimes = []; // Menyimpan nilai default jam
 
 // ── Dark mode ──
 document.getElementById('theme-toggle').onclick = () => {
@@ -465,15 +476,47 @@ function buildJamConfig() {
     '09.10–09.35','09.55–10.20','10.20–10.45','10.45–11.10',
     '11.10–11.35','11.35–12.00','14.30–15.15','15.15–16.00'
   ];
+  defaultJamTimes = [];
   for (let i = 0; i < n; i++) {
+    const defaultVal = defaults[i] || '';
+    defaultJamTimes.push(defaultVal);
     wrap.innerHTML += `<div class="jam-item">
       <label>Jam ke-${i+1}</label>
-      <input type="text" class="jam-time" id="jt-${i+1}" placeholder="${defaults[i]||''}" value="${defaults[i]||''}">
+      <input type="text" class="jam-time" id="jt-${i+1}" placeholder="${defaultVal}" value="${defaultVal}">
     </div>`;
+  }
+  // Set checkbox state: jika checkbox dicentang, kosongkan semua
+  const chk = document.getElementById('clear-jam-checkbox');
+  if (chk && chk.checked) {
+    clearAllJamFields(true);
   }
 }
 buildJamConfig();
-document.getElementById('jam-per-hari').addEventListener('input', buildJamConfig);
+
+// Fungsi untuk mengosongkan/mengisi jam berdasarkan checkbox
+function clearAllJamFields(forceClear) {
+  const n = parseInt(document.getElementById('jam-per-hari').value) || 10;
+  for (let i = 1; i <= n; i++) {
+    const el = document.getElementById(`jt-${i}`);
+    if (el) {
+      if (forceClear) {
+        el.value = '';
+      } else {
+        el.value = defaultJamTimes[i-1] || '';
+      }
+    }
+  }
+}
+
+// Event listener untuk checkbox
+document.getElementById('clear-jam-checkbox').addEventListener('change', function(e) {
+  clearAllJamFields(e.target.checked);
+});
+
+// Saat jumlah jam berubah, rebuild dan sesuaikan checkbox
+document.getElementById('jam-per-hari').addEventListener('input', function() {
+  buildJamConfig();
+});
 
 // ── Counter ──
 document.getElementById('kodes').addEventListener('input', function() {
@@ -629,14 +672,29 @@ function getSpecialClass(kode) {
   return '';
 }
 
-// ── Download JPG dengan rasio 4:3 ──
+// ── Download JPG dengan rasio 4:3 (fix potong di HP) ──
 function downloadJPG() {
+  if (scheduleData.length === 0) {
+    showToast('❌ Buat jadwal terlebih dahulu');
+    return;
+  }
   showToast('🖼️ Menyiapkan gambar...');
   const element = document.getElementById('jadwal-print-area');
-  html2canvas(element, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+  // Simpan style asli
+  const originalWidth = element.style.width;
+  const originalMaxWidth = element.style.maxWidth;
+  // Set agar elemen selebar kontennya (untuk menghindari pemotongan)
+  element.style.width = 'max-content';
+  element.style.maxWidth = 'none';
+  
+  html2canvas(element, { scale: 1.5, backgroundColor: '#ffffff', logging: false, allowTaint: false, useCORS: true }).then(canvas => {
+    // Kembalikan style
+    element.style.width = originalWidth;
+    element.style.maxWidth = originalMaxWidth;
+    
     const origW = canvas.width;
     const origH = canvas.height;
-    const targetRatio = 4 / 3; // 1.333
+    const targetRatio = 4 / 3;
     let targetW, targetH;
     if (origW / origH > targetRatio) {
       targetH = origH;
@@ -667,16 +725,34 @@ function downloadJPG() {
       showToast('✅ JPG berhasil diunduh!');
     }, 'image/jpeg', 0.95);
   }).catch(err => {
+    // Kembalikan style meskipun error
+    element.style.width = originalWidth;
+    element.style.maxWidth = originalMaxWidth;
     console.error(err);
     showToast('❌ Gagal membuat gambar');
   });
 }
 
-// ── Download PDF dengan rasio 4:3 ──
+// ── Download PDF dengan rasio 4:3 (fix potong di HP) ──
 function downloadPDF() {
+  if (scheduleData.length === 0) {
+    showToast('❌ Buat jadwal terlebih dahulu');
+    return;
+  }
   showToast('📄 Menyiapkan PDF...');
   const element = document.getElementById('jadwal-print-area');
-  html2canvas(element, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+  // Simpan style asli
+  const originalWidth = element.style.width;
+  const originalMaxWidth = element.style.maxWidth;
+  // Set agar elemen selebar kontennya
+  element.style.width = 'max-content';
+  element.style.maxWidth = 'none';
+  
+  html2canvas(element, { scale: 1.5, backgroundColor: '#ffffff', logging: false, allowTaint: false, useCORS: true }).then(canvas => {
+    // Kembalikan style
+    element.style.width = originalWidth;
+    element.style.maxWidth = originalMaxWidth;
+    
     const { jsPDF } = window.jspdf;
     const pdfW = 240; // mm
     const pdfH = 180; // mm
@@ -700,12 +776,18 @@ function downloadPDF() {
     pdf.save(`Jadwal-${document.getElementById('nama-kelas').value || 'Kelas'}.pdf`);
     showToast('✅ PDF berhasil diunduh!');
   }).catch(err => {
+    element.style.width = originalWidth;
+    element.style.maxWidth = originalMaxWidth;
     console.error(err);
     showToast('❌ Gagal membuat PDF');
   });
 }
 
 function downloadCSV() {
+  if (scheduleData.length === 0) {
+    showToast('❌ Buat jadwal terlebih dahulu');
+    return;
+  }
   const kelas = document.getElementById('nama-kelas').value||'Kelas';
   let csv = `Jadwal Kelas ${kelas}\n`;
   csv += 'Hari,Jam ke-,Kode,Mata Pelajaran,Guru\n';
