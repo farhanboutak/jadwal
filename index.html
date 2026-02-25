@@ -8,170 +8,214 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+:root {
+    --bg1:#0f2027;
+    --bg2:#203a43;
+    --bg3:#2c5364;
+    --card:rgba(255,255,255,0.08);
+    --text:#ffffff;
 }
 
-body {
-    height: 100vh;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    overflow: hidden;
+body.light {
+    --bg1:#f5f7fa;
+    --bg2:#c3cfe2;
+    --bg3:#e2e2e2;
+    --card:rgba(0,0,0,0.05);
+    --text:#111;
 }
 
-.container {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    padding: 50px;
-    border-radius: 25px;
-    width: 95%;
-    max-width: 600px;
-    text-align: center;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-    animation: fadeIn 1s ease;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
 }
 
-.icon {
-    font-size: 60px;
-    margin-bottom: 20px;
-    animation: spin 6s linear infinite;
+body{
+    height:100vh;
+    background: linear-gradient(-45deg,var(--bg1),var(--bg2),var(--bg3));
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:var(--text);
+    overflow:hidden;
 }
 
-h1 {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 10px;
+@keyframes gradient{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
 }
 
-p {
-    opacity: 0.8;
-    margin-bottom: 25px;
+.container{
+    background:var(--card);
+    backdrop-filter:blur(25px);
+    padding:50px;
+    border-radius:25px;
+    width:95%;
+    max-width:650px;
+    text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+    animation:fadeIn 1s ease;
 }
 
-.countdown {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 20px;
+h1{
+    font-size:32px;
+    margin-bottom:10px;
 }
 
-.progress-container {
-    width: 100%;
-    background: rgba(255,255,255,0.1);
-    border-radius: 20px;
-    overflow: hidden;
-    margin-bottom: 20px;
+p{
+    opacity:0.8;
+    margin-bottom:25px;
 }
 
-.progress-bar {
-    height: 12px;
-    width: 0%;
-    background: linear-gradient(90deg, #00f5a0, #00d9f5);
-    transition: width 1s linear;
+.countdown{
+    font-weight:600;
+    font-size:18px;
+    margin-bottom:15px;
 }
 
-.time {
-    font-size: 14px;
-    opacity: 0.7;
-    margin-bottom: 20px;
+.progress-container{
+    width:100%;
+    height:12px;
+    background:rgba(255,255,255,0.15);
+    border-radius:20px;
+    overflow:hidden;
+    margin-bottom:20px;
 }
 
-button {
-    padding: 12px 28px;
-    border-radius: 30px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    background: linear-gradient(90deg, #00f5a0, #00d9f5);
-    color: black;
-    transition: 0.3s;
+.progress{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#00f5a0,#00d9f5);
+    transition:width 1s linear;
 }
 
-button:hover {
-    transform: scale(1.05);
+.status{
+    margin-bottom:15px;
+    font-size:14px;
 }
 
-@keyframes fadeIn {
-    from {opacity:0; transform: translateY(20px);}
-    to {opacity:1; transform: translateY(0);}
+.time{
+    font-size:13px;
+    opacity:0.7;
+    margin-bottom:20px;
 }
 
-@keyframes spin {
-    from {transform: rotate(0deg);}
-    to {transform: rotate(360deg);}
+input{
+    padding:10px 15px;
+    border-radius:30px;
+    border:none;
+    width:70%;
+    margin-bottom:10px;
+    outline:none;
+}
+
+button{
+    padding:10px 20px;
+    border:none;
+    border-radius:30px;
+    cursor:pointer;
+    font-weight:600;
+    margin:5px;
+    background:linear-gradient(90deg,#00f5a0,#00d9f5);
+    color:#000;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+.toggle{
+    position:absolute;
+    top:20px;
+    right:20px;
+    font-size:14px;
+    cursor:pointer;
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(20px);}
+    to{opacity:1; transform:translateY(0);}
 }
 
 @media(max-width:480px){
-    .container {
-        padding: 30px 20px;
-    }
-    h1 {
-        font-size: 24px;
-    }
+    .container{padding:30px 20px;}
+    h1{font-size:24px;}
+    input{width:100%;}
 }
 </style>
 </head>
 
 <body>
 
+<div class="toggle" onclick="toggleTheme()">🌙/☀️ Mode</div>
+
 <div class="container">
-    <div class="icon">⚙️</div>
-    <h1>Website Sedang Maintenance</h1>
-    <p>Kami sedang melakukan pembaruan sistem untuk meningkatkan performa dan keamanan. Silakan kembali beberapa saat lagi.</p>
+    <h1>🚧 Website Maintenance</h1>
+    <p>Kami sedang melakukan upgrade sistem untuk performa dan keamanan yang lebih baik.</p>
 
     <div class="countdown" id="countdown"></div>
 
     <div class="progress-container">
-        <div class="progress-bar" id="progress"></div>
+        <div class="progress" id="progress"></div>
     </div>
+
+    <div class="status" id="status"></div>
 
     <div class="time" id="time"></div>
 
-    <button onclick="location.reload()">Refresh Halaman</button>
+    <input type="email" placeholder="Masukkan email untuk notifikasi">
+    <br>
+    <button onclick="alert('Email tersimpan (simulasi)')">🔔 Notify Me</button>
+    <button onclick="location.reload()">🔄 Refresh</button>
 </div>
 
 <script>
-// === Waktu selesai maintenance (ubah sesuai kebutuhan) ===
 const endTime = new Date();
-endTime.setMinutes(endTime.getMinutes() + 30); // 30 menit dari sekarang
-
-const countdownEl = document.getElementById("countdown");
-const progressEl = document.getElementById("progress");
-const timeEl = document.getElementById("time");
+endTime.setMinutes(endTime.getMinutes()+20);
 
 const startTime = new Date();
-const totalDuration = endTime - startTime;
+const total = endTime - startTime;
 
-function updateMaintenance() {
+function update(){
     const now = new Date();
-    const distance = endTime - now;
+    const diff = endTime - now;
 
-    // Jam realtime
-    timeEl.innerHTML = "Waktu sekarang: " + now.toLocaleString();
+    document.getElementById("time").innerHTML =
+        "Waktu sekarang: "+ now.toLocaleString();
 
-    if (distance <= 0) {
-        countdownEl.innerHTML = "Maintenance Selesai ✅";
-        progressEl.style.width = "100%";
+    if(diff<=0){
+        document.getElementById("countdown").innerHTML="Website Sudah Online ✅";
+        document.getElementById("status").innerHTML="Status Server: 🟢 Online";
+        document.getElementById("progress").style.width="100%";
+        setTimeout(()=>location.reload(),3000);
         return;
     }
 
-    const minutes = Math.floor(distance / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    const m=Math.floor(diff/(1000*60));
+    const s=Math.floor((diff%(1000*60))/1000);
 
-    countdownEl.innerHTML = `Perkiraan selesai dalam ${minutes} menit ${seconds} detik`;
+    document.getElementById("countdown").innerHTML=
+        `Perkiraan selesai dalam ${m} menit ${s} detik`;
 
-    const progress = ((totalDuration - distance) / totalDuration) * 100;
-    progressEl.style.width = progress + "%";
+    document.getElementById("status").innerHTML=
+        "Status Server: 🔴 Maintenance";
+
+    const percent=((total-diff)/total)*100;
+    document.getElementById("progress").style.width=percent+"%";
 }
 
-setInterval(updateMaintenance, 1000);
-updateMaintenance();
+function toggleTheme(){
+    document.body.classList.toggle("light");
+}
+
+setInterval(update,1000);
+update();
 </script>
 
 </body>
-</html>
+</html></html>
