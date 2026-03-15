@@ -276,6 +276,116 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   .filter-bar { flex-direction: column; align-items: stretch; }
   .range-wrap, .time-toggle-wrap { justify-content: flex-start; }
 }
+
+/* Modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s;
+}
+
+.modal-content {
+  background: var(--surface);
+  border-radius: var(--radius);
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  animation: slideUp 0.3s;
+}
+
+.modal-body {
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.modal-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.modal h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.modal p {
+  color: var(--text2);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.close-btn {
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 8px 16px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: var(--accent);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Item histori */
+.histori-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.histori-item:last-child { border-bottom: none; }
+.histori-info {
+  flex: 1;
+  cursor: pointer;
+}
+.histori-info:hover {
+  background: var(--surface2);
+}
+.histori-judul {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.histori-tanggal {
+  font-size: 0.7rem;
+  color: var(--text2);
+}
+.histori-actions {
+  display: flex;
+  gap: 8px;
+}
+.histori-actions button {
+  padding: 4px 8px;
+  font-size: 0.7rem;
+}
 </style>
 </head>
 <body>
@@ -388,7 +498,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
         <button class="btn btn-ghost" onclick="muatJadwal()">📂 Muat</button>
         <!-- Tombol Histori -->
         <button class="btn btn-ghost" onclick="tampilkanHistori()">📜 Histori</button>
-        <!-- Tombol Link Pendek -->
+        <!-- Tombol Link Pendek (sudah diperbaiki) -->
         <button class="btn btn-ghost" onclick="getShortLink()">🔗 Link Pendek</button>
         <button class="btn btn-success" onclick="downloadCSV()">📊 CSV</button>
         <button class="btn btn-warning" onclick="downloadJPG()">🖼️ JPG</button>
@@ -470,118 +580,6 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   </div>
 </div>
 
-<style>
-/* Modal styling */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 10000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.3s;
-}
-
-.modal-content {
-  background: var(--surface);
-  border-radius: var(--radius);
-  max-width: 400px;
-  width: 90%;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  animation: slideUp 0.3s;
-}
-
-.modal-body {
-  padding: 32px 24px;
-  text-align: center;
-}
-
-.modal-icon {
-  font-size: 3rem;
-  display: block;
-  margin-bottom: 16px;
-}
-
-.modal h2 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 12px;
-}
-
-.modal p {
-  color: var(--text2);
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-
-.close-btn {
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  color: var(--text2);
-  cursor: pointer;
-  padding: 8px 16px;
-  line-height: 1;
-  transition: color 0.2s;
-}
-
-.close-btn:hover {
-  color: var(--accent);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-/* Item histori */
-.histori-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-}
-.histori-item:last-child { border-bottom: none; }
-.histori-info {
-  flex: 1;
-  cursor: pointer;
-}
-.histori-info:hover {
-  background: var(--surface2);
-}
-.histori-judul {
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-.histori-tanggal {
-  font-size: 0.7rem;
-  color: var(--text2);
-}
-.histori-actions {
-  display: flex;
-  gap: 8px;
-}
-.histori-actions button {
-  padding: 4px 8px;
-  font-size: 0.7rem;
-}
-</style>
-
 <script>
 // ==================  KODE GURU ==================
 const kodeGuru = {
@@ -649,7 +647,7 @@ const kodeGuru = {
   "KRIDA": { nama: "", mapel: "Krida" },
   "Krida": { nama: "", mapel: "Krida" },
   "BK": { nama: "", mapel: "BK" },
-  "KJR": { nama: "", mapel: "Mata Pelajaran Kejuruan" }, // perbaiki koma
+  "KJR": { nama: "", mapel: "Mata Pelajaran Kejuruan" },
   "-": { nama: "", mapel: "" },
 
   // KODE TEST (untuk contoh data)
@@ -1274,22 +1272,28 @@ function clearHistori() {
 function getShortLink() {
   // Kumpulkan semua data dari form
   const data = {
-    sekolah: document.getElementById('nama-sekolah').value,
-    kelas: document.getElementById('nama-kelas').value,
-    semester: document.getElementById('semester').value,
-    tgl: document.getElementById('tgl-mulai').value,
-    jamPerHari: document.getElementById('jam-per-hari').value,
-    jamTimes: [],
-    kodes: document.getElementById('kodes').value
+    s: document.getElementById('nama-sekolah').value,
+    k: document.getElementById('nama-kelas').value,
+    sem: document.getElementById('semester').value,
+    t: document.getElementById('tgl-mulai').value,
+    jph: document.getElementById('jam-per-hari').value,
+    jt: [],
+    kd: document.getElementById('kodes').value
   };
-  for (let i = 1; i <= data.jamPerHari; i++) {
+  
+  // Ambil data jam
+  for (let i = 1; i <= data.jph; i++) {
     const el = document.getElementById(`jt-${i}`);
-    if (el) data.jamTimes.push(el.value);
+    if (el) data.jt.push(el.value);
   }
+  
   // Kompres dengan lz-string
   const json = JSON.stringify(data);
   const compressed = LZString.compressToEncodedURIComponent(json);
+  
+  // Buat URL pendek (gunakan current URL tanpa hash)
   const url = window.location.href.split('#')[0] + '#' + compressed;
+  
   // Salin ke clipboard
   navigator.clipboard.writeText(url).then(() => {
     showToast('🔗 Link pendek disalin ke clipboard!');
@@ -1326,22 +1330,36 @@ window.addEventListener('load', function() {
       const json = LZString.decompressFromEncodedURIComponent(hash);
       if (!json) throw new Error('Gagal dekompres');
       const data = JSON.parse(json);
-      // Isi form
-      document.getElementById('nama-sekolah').value = data.sekolah || '';
-      document.getElementById('nama-kelas').value = data.kelas || '';
-      document.getElementById('semester').value = data.semester || '';
-      document.getElementById('tgl-mulai').value = data.tgl || '';
-      document.getElementById('jam-per-hari').value = data.jamPerHari || 10;
+      
+      // Isi form dengan data yang sudah didekompres
+      document.getElementById('nama-sekolah').value = data.s || '';
+      document.getElementById('nama-kelas').value = data.k || '';
+      document.getElementById('semester').value = data.sem || '';
+      document.getElementById('tgl-mulai').value = data.t || '';
+      document.getElementById('jam-per-hari').value = data.jph || 10;
+      
       buildJamConfig();
-      if (data.jamTimes && Array.isArray(data.jamTimes)) {
-        for (let i = 0; i < data.jamTimes.length; i++) {
+      
+      // Isi jam jika ada
+      if (data.jt && Array.isArray(data.jt)) {
+        for (let i = 0; i < data.jt.length; i++) {
           const el = document.getElementById(`jt-${i+1}`);
-          if (el) el.value = data.jamTimes[i];
+          if (el) el.value = data.jt[i];
         }
       }
-      document.getElementById('kodes').value = data.kodes || '';
+      
+      // Set checkbox jam
+      if (data.jt && data.jt.every(j => j === '')) {
+        document.getElementById('clear-jam-checkbox').checked = true;
+      } else {
+        document.getElementById('clear-jam-checkbox').checked = false;
+      }
+      
+      // Isi kode dan generate
+      document.getElementById('kodes').value = data.kd || '';
       document.getElementById('kodes').dispatchEvent(new Event('input'));
       generateJadwal(); // langsung generate
+      
       showToast('✅ Data dari link dimuat');
     } catch (e) {
       console.error('Gagal memuat data dari link', e);
