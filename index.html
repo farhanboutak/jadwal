@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generator Jadwal Pelajaran – AI Powered Schedule</title>
+<title>Generator Jadwal Pelajaran – Admin Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
@@ -24,6 +24,10 @@
   --radius: 16px;
   --radius-sm: 8px;
   --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
 }
 [data-theme="dark"] {
   --bg: #0f172a; --surface: #1e293b; --surface2: #162032;
@@ -33,6 +37,107 @@
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
+
+/* Login Page */
+#login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: var(--gradient);
+  padding: 20px;
+}
+.login-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: 400px;
+  width: 100%;
+  padding: 40px;
+  animation: slideUp 0.5s;
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.login-logo .logo-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--gradient);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  margin: 0 auto 15px;
+  animation: pulse 2s infinite;
+}
+.login-logo h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+.login-logo p {
+  color: var(--text2);
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+.login-form {
+  margin-top: 30px;
+}
+.login-form .form-group {
+  margin-bottom: 20px;
+}
+.login-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+.login-form input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: all 0.3s;
+}
+.login-form input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  outline: none;
+}
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--gradient);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 10px;
+}
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+}
+.login-footer {
+  text-align: center;
+  margin-top: 25px;
+  color: var(--text2);
+  font-size: 0.8rem;
+}
+.login-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
 
 /* Header */
 header {
@@ -107,6 +212,7 @@ main { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
 /* Form */
 .form-row { display: grid; gap: 16px; margin-bottom: 18px; }
 .form-row-2 { grid-template-columns: 1fr 1fr; }
+.form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-label { font-size: 0.82rem; font-weight: 600; color: var(--text); }
 .form-label .badge { 
@@ -125,7 +231,7 @@ main { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
   50% { opacity: 0.7; }
   100% { opacity: 1; }
 }
-input[type="text"], input[type="number"], select, textarea {
+input[type="text"], input[type="number"], input[type="password"], select, textarea {
   padding: 10px 14px; background: var(--surface2); border: 1.5px solid var(--border);
   border-radius: var(--radius-sm); font-family: inherit; font-size: 0.85rem; color: var(--text);
   transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
@@ -562,6 +668,159 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   border-color: var(--accent);
 }
 
+/* Admin Table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.admin-table th {
+  background: var(--accent-light);
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.admin-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.admin-table tr:hover {
+  background: var(--surface2);
+}
+.admin-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.badge-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+.badge-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+.badge-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Admin Dashboard */
+.admin-dashboard {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 20px;
+  min-height: 100vh;
+}
+.admin-sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px;
+}
+.admin-sidebar .logo {
+  margin-bottom: 30px;
+}
+.admin-menu {
+  list-style: none;
+}
+.admin-menu li {
+  margin-bottom: 5px;
+}
+.admin-menu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.admin-menu a:hover {
+  background: var(--accent-light);
+}
+.admin-menu a.active {
+  background: var(--accent);
+  color: white;
+}
+.admin-menu a i {
+  width: 20px;
+}
+.admin-content {
+  padding: 20px;
+}
+
+/* Setting Group */
+.setting-group {
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.setting-group h4 {
+  margin-bottom: 15px;
+  color: var(--accent);
+}
+
+/* Backup List */
+.backup-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+}
+.backup-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.backup-name {
+  font-weight: 600;
+}
+.backup-date {
+  font-size: 0.7rem;
+  color: var(--text2);
+}
+.backup-actions {
+  display: flex;
+  gap: 5px;
+}
+
+/* Activity Log */
+.activity-log {
+  max-height: 400px;
+  overflow-y: auto;
+}
+.log-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.log-time {
+  font-size: 0.7rem;
+  color: var(--text2);
+  min-width: 60px;
+}
+.log-event {
+  flex: 1;
+  font-size: 0.85rem;
+}
+.log-user {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  background: var(--accent-light);
+  border-radius: 100px;
+}
+
 /* Print */
 @media print {
   body * { visibility: hidden; }
@@ -576,264 +835,550 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   .range-wrap, .time-toggle-wrap { justify-content: flex-start; }
   .stats-grid { grid-template-columns: 1fr; }
   .tabs { justify-content: center; }
+  .admin-dashboard { grid-template-columns: 1fr; }
+  .admin-sidebar { display: none; }
+  .admin-sidebar.active { display: block; position: fixed; width: 250px; height: 100vh; z-index: 1000; }
 }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <div class="logo-icon">🤖</div>
-    <div>
-      <h1>Jadwal AI Pro</h1>
-      <span>Powered by Artificial Intelligence</span>
+<!-- Login Page -->
+<div id="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">🔐</div>
+      <h1>Admin Dashboard</h1>
+      <p>Generator Jadwal Pelajaran Pro</p>
+    </div>
+    <div class="login-form">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Masukkan username" value="admin">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Masukkan password" value="admin123">
+      </div>
+      <button class="login-btn" onclick="login()">🔑 Login ke Admin</button>
+    </div>
+    <div class="login-footer">
+      <p>Default: admin / admin123</p>
+      <p><a href="#" onclick="showMainApp()">← Kembali ke Aplikasi Utama</a></p>
     </div>
   </div>
-  <div class="header-actions">
-    <button class="btn-icon" id="theme-toggle" title="Dark mode">🌙</button>
-    <button class="btn-icon" onclick="window.print()" title="Cetak">🖨️</button>
-  </div>
-</header>
+</div>
 
-<main>
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('editor', this)">📝 Editor</div>
-    <div class="tab" onclick="switchTab('analytics', this)">📊 Analytics</div>
-    <div class="tab" onclick="switchTab('quiz', this)">🎮 Quiz Mode</div>
-    <div class="tab" onclick="switchTab('themes', this)">🎨 Themes</div>
-  </div>
-
-  <!-- Tab Editor (Default) -->
-  <div id="tab-editor" style="display: block;">
-    <!-- Step 1: Info Kelas -->
-    <div class="card" id="step1-card">
-      <div class="card-header">
-        <span class="card-header-icon">🏫</span>
-        <div><h2>Informasi Jadwal</h2><p>Isi identitas sekolah dan kelas</p></div>
+<!-- Main App (Hidden by default) -->
+<div id="main-app" style="display: none;">
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🤖</div>
+      <div>
+        <h1>Jadwal AI Pro</h1>
+        <span>Powered by Artificial Intelligence</span>
       </div>
-      <div class="card-body">
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="theme-toggle" title="Dark mode">🌙</button>
+      <button class="btn-icon" onclick="window.print()" title="Cetak">🖨️</button>
+      <button class="btn-icon" onclick="showAdminLogin()" title="Admin Panel">👤</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('editor', this)">📝 Editor</div>
+      <div class="tab" onclick="switchTab('analytics', this)">📊 Analytics</div>
+      <div class="tab" onclick="switchTab('quiz', this)">🎮 Quiz Mode</div>
+      <div class="tab" onclick="switchTab('themes', this)">🎨 Themes</div>
+    </div>
+
+    <!-- Tab Editor (Default) -->
+    <div id="tab-editor" style="display: block;">
+      <!-- Step 1: Info Kelas -->
+      <div class="card" id="step1-card">
+        <div class="card-header">
+          <span class="card-header-icon">🏫</span>
+          <div><h2>Informasi Jadwal</h2><p>Isi identitas sekolah dan kelas</p></div>
+        </div>
+        <div class="card-body">
+          <div class="form-row form-row-2">
+            <div class="form-group">
+              <label class="form-label">Nama Sekolah</label>
+              <input type="text" id="nama-sekolah" placeholder="SMKN 2 Wonosari" value="SMKN 2 Wonosari">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nama Kelas</label>
+              <input type="text" id="nama-kelas" placeholder="Contoh: XI TJKT 3" value="XI TJKT 3">
+            </div>
+          </div>
+          <div class="form-row form-row-2">
+            <div class="form-group">
+              <label class="form-label">Semester</label>
+              <input type="text" id="semester" placeholder="Semester 1" value="Semester 2">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tanggal Mulai</label>
+              <input type="text" id="tgl-mulai" placeholder="Mulai 18 Juli 2022" value="Mulai 18 Juli 2022">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Jumlah Jam per Hari <span class="badge">Senin–Kamis</span></label>
+              <input type="number" id="jam-per-hari" value="10" min="6" max="12" style="max-width:120px;">
+              <p class="form-hint">Jumat otomatis menggunakan sisa kode</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Jam & Waktu -->
+      <div class="card" id="step2-card">
+        <div class="card-header">
+          <span class="card-header-icon">⏰</span>
+          <div><h2>Waktu Jam Pelajaran</h2><p>Opsional — isi waktu tiap jam</p></div>
+        </div>
+        <div class="card-body">
+          <div class="clear-jam-wrapper">
+            <input type="checkbox" id="clear-jam-checkbox" checked>
+            <label for="clear-jam-checkbox">Kosongkan semua jam (sembunyikan waktu)</label>
+          </div>
+          <div class="jam-config" id="jam-config-wrap"></div>
+        </div>
+      </div>
+
+      <!-- Step 3: Input Kode -->
+      <div class="card" id="step3-card">
+        <div class="card-header">
+          <span class="card-header-icon">📝</span>
+          <div><h2>Input Kode Guru</h2><p>Masukkan kode guru sesuai urutan jam</p></div>
+        </div>
+        <div class="card-body">
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label">Kode Guru <span class="badge">Minimal 41 kode</span></label>
+            <textarea id="kodes" placeholder="Pisah spasi/koma. Contoh:&#10;Upcr DTK DTK END END YTS YTS G1 G1 G1&#10;GLS GLS NRM DRS DRS SGS SGS SGS IF1 IF1&#10;..."></textarea>
+            <p class="form-hint">Senin–Kamis: <strong id="hint-jam">10</strong> kode/hari · Jumat: sisanya</p>
+          </div>
+          <div class="counter-row" id="counter-row" style="display:none">
+            <div class="counter-chip" id="chip-total">📊 0 kode</div>
+            <div class="counter-chip" id="chip-seninkamis">Senin–Kamis: 0/40</div>
+            <div class="counter-chip" id="chip-jumat">Jumat: 0</div>
+            <div class="counter-chip" id="chip-status">⏳</div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="generateJadwal()">✨ Buat Jadwal</button>
+            <button class="btn btn-ghost" onclick="clearForm()">🗑️ Reset</button>
+            <button class="btn btn-outline" onclick="loadContoh()">📋 Contoh Data</button>
+            <button class="btn btn-ai" onclick="aiOptimizeSchedule()">🤖 AI Optimasi</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div id="output-section">
+        <div class="output-toolbar">
+          <div class="output-title">
+            <h2 id="out-kelas-title"></h2>
+            <p id="out-subtitle"></p>
+          </div>
+          <div class="export-btns">
+            <button class="btn btn-ghost" onclick="showInputSection()">✏️ Edit</button>
+            <button class="btn btn-share" onclick="generateShareableLink()">🔗 Buat Link Share</button>
+            <button class="btn btn-success" onclick="downloadCSV()">📊 CSV</button>
+            <button class="btn btn-warning" onclick="downloadJPG()">🖼️ JPG</button>
+            <button class="btn btn-ai" onclick="showScheduleStats()">📈 Statistik</button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Cari mapel, guru, kode..." oninput="renderGrid()">
+            <button class="clear-search" onclick="document.getElementById('search-input').value=''; renderGrid();">✖</button>
+          </div>
+          <select class="filter-select" id="filter-hari" onchange="renderGrid()">
+            <option value="">Semua Hari</option>
+            <option>Senin</option><option>Selasa</option><option>Rabu</option>
+            <option>Kamis</option><option>Jumat</option>
+          </select>
+          <div class="range-wrap">
+            <label for="font-size-slider">🔤 Ukuran:</label>
+            <input type="range" id="font-size-slider" min="0.8" max="1.5" step="0.1" value="1.0">
+            <span id="font-size-value">1.0rem</span>
+          </div>
+          <div class="time-toggle-wrap">
+            <input type="checkbox" id="show-time-row" onchange="renderGrid()">
+            <label for="show-time-row">⏲️ Tampilkan jam</label>
+          </div>
+        </div>
+
+        <!-- The printable grid area -->
+        <div id="jadwal-print-area">
+          <div class="jadwal-title-block">
+            <div class="jadwal-main-title" id="print-main-title"></div>
+            <div class="jadwal-kelas-name" id="print-kelas-name"></div>
+          </div>
+          <div class="sched-grid-wrap">
+            <table class="sched-grid" id="sched-grid-table"></table>
+          </div>
+          <div class="jadwal-footer">
+            <span id="footer-left"></span>
+            <span id="footer-right">Generated by Jadwal AI Pro</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Analytics -->
+    <div id="tab-analytics" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-header-icon">📊</span>
+          <div><h2>Analytics Dashboard</h2><p>Statistik dan analisis jadwal</p></div>
+        </div>
+        <div class="card-body">
+          <div class="stats-grid" id="stats-grid">
+            <!-- Stats will be populated here -->
+          </div>
+          <div style="margin-top: 30px;">
+            <canvas id="scheduleChart" style="width:100%; max-height:400px;"></canvas>
+          </div>
+          <div style="margin-top: 30px;">
+            <h4 style="margin-bottom: 16px;">🎯 Rekomendasi AI</h4>
+            <div id="ai-recommendations" class="quiz-container" style="background: var(--accent-light);">
+              <p>Generate jadwal terlebih dahulu untuk melihat rekomendasi AI</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Quiz Mode -->
+    <div id="tab-quiz" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-header-icon">🎮</span>
+          <div><h2>Quiz Mode</h2><p>Tebak jadwal untuk membantu menghafal</p></div>
+        </div>
+        <div class="card-body">
+          <div class="quiz-container" id="quiz-container">
+            <div class="quiz-question" id="quiz-question">Generate jadwal untuk memulai quiz</div>
+            <div class="quiz-options" id="quiz-options"></div>
+            <div style="margin-top: 20px; text-align: center;">
+              <span id="quiz-score" style="font-weight: 700; color: var(--accent);">Score: 0</span>
+            </div>
+            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+              <button class="btn btn-primary" onclick="startQuiz()">🎮 Mulai Quiz</button>
+              <button class="btn btn-ghost" onclick="nextQuizQuestion()">⏭️ Soal Berikutnya</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Themes -->
+    <div id="tab-themes" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-header-icon">🎨</span>
+          <div><h2>Color Themes</h2><p>Pilih tema warna untuk jadwal</p></div>
+        </div>
+        <div class="card-body">
+          <div class="theme-picker">
+            <div class="theme-color" style="background: #2563eb;" onclick="changeTheme('blue')" title="Blue"></div>
+            <div class="theme-color" style="background: #059669;" onclick="changeTheme('green')" title="Green"></div>
+            <div class="theme-color" style="background: #8b5cf6;" onclick="changeTheme('purple')" title="Purple"></div>
+            <div class="theme-color" style="background: #d97706;" onclick="changeTheme('orange')" title="Orange"></div>
+            <div class="theme-color" style="background: #dc2626;" onclick="changeTheme('red')" title="Red"></div>
+            <div class="theme-color" style="background: #ec4899;" onclick="changeTheme('pink')" title="Pink"></div>
+          </div>
+          
+          <h4 style="margin: 30px 0 16px;">📱 QR Code Jadwal</h4>
+          <div class="qr-container" id="qr-container">
+            <div class="qr-code" id="qr-code">
+              <!-- QR Code akan digenerate di sini -->
+            </div>
+          </div>
+          <p style="text-align: center; margin-top: 8px;" id="qr-status">Klik tombol di bawah untuk generate QR Code</p>
+          <div style="text-align: center; margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="generateQRCode()">📱 Generate QR Code</button>
+            <button class="btn btn-outline" onclick="downloadQRCode()">💾 Download QR Code</button>
+          </div>
+
+          <h4 style="margin: 30px 0 16px;">🔔 Pengingat Jadwal</h4>
+          <div class="quiz-container" style="background: var(--accent-light);">
+            <div style="margin-bottom: 16px;">
+              <label class="form-label">Set Pengingat (menit sebelum jam)</label>
+              <input type="number" id="reminder-minutes" value="5" min="1" max="60" style="width: 100px;">
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn btn-success" onclick="setReminder()">⏰ Set Pengingat</button>
+              <button class="btn btn-ghost" onclick="clearReminder()">🗑️ Hapus</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Admin Dashboard (Hidden by default) -->
+<div id="admin-dashboard" style="display: none;">
+  <div class="admin-dashboard">
+    <div class="admin-sidebar">
+      <div class="logo">
+        <div class="logo-icon">👨‍💼</div>
+        <div>
+          <h1>Admin Panel</h1>
+          <span>Control Center</span>
+        </div>
+      </div>
+      <ul class="admin-menu">
+        <li><a href="#" onclick="showAdminSection('dashboard', this)" class="active"><i>📊</i> Dashboard</a></li>
+        <li><a href="#" onclick="showAdminSection('users', this)"><i>👥</i> Manajemen User</a></li>
+        <li><a href="#" onclick="showAdminSection('jadwal', this)"><i>📅</i> Semua Jadwal</a></li>
+        <li><a href="#" onclick="showAdminSection('guru', this)"><i>👨‍🏫</i> Data Guru</a></li>
+        <li><a href="#" onclick="showAdminSection('settings', this)"><i>⚙️</i> Pengaturan</a></li>
+        <li><a href="#" onclick="showAdminSection('backup', this)"><i>💾</i> Backup & Restore</a></li>
+        <li><a href="#" onclick="showAdminSection('logs', this)"><i>📋</i> Activity Logs</a></li>
+        <li><a href="#" onclick="logout()"><i>🚪</i> Logout</a></li>
+      </ul>
+    </div>
+    <div class="admin-content">
+      <!-- Dashboard Section -->
+      <div id="admin-dashboard-section" style="display: block;">
+        <h2 style="margin-bottom: 20px;">Dashboard Overview</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-value" id="total-jadwal">0</div>
+            <div class="stat-label">Total Jadwal</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👨‍🏫</div>
+            <div class="stat-value" id="total-guru">0</div>
+            <div class="stat-label">Total Guru</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-value" id="total-mapel">0</div>
+            <div class="stat-label">Mata Pelajaran</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value" id="total-users">3</div>
+            <div class="stat-label">Active Users</div>
+          </div>
+        </div>
+
+        <div class="form-row form-row-2" style="margin-top: 30px;">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-header-icon">📊</span>
+              <div><h2>Aktivitas Terkini</h2></div>
+            </div>
+            <div class="card-body">
+              <div class="activity-log" id="activity-log">
+                <!-- Logs will be populated here -->
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-header-icon">📈</span>
+              <div><h2>Statistik Penggunaan</h2></div>
+            </div>
+            <div class="card-body">
+              <canvas id="usageChart" style="width:100%; height:200px;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Section -->
+      <div id="admin-users-section" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2>Manajemen User</h2>
+          <button class="btn btn-primary" onclick="showAddUserModal()">➕ Tambah User</button>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Terakhir Login</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <!-- Users will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jadwal Section -->
+      <div id="admin-jadwal-section" style="display: none;">
+        <h2 style="margin-bottom: 20px;">Semua Jadwal Tersimpan</h2>
+        <div class="card">
+          <div class="card-body">
+            <div class="search-wrap" style="margin-bottom: 20px;">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="search-jadwal-admin" placeholder="Cari jadwal..." oninput="searchJadwalAdmin()">
+            </div>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Sekolah</th>
+                  <th>Kelas</th>
+                  <th>Semester</th>
+                  <th>Total Jam</th>
+                  <th>Dibuat</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="jadwal-table-body">
+                <!-- Jadwal will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guru Section -->
+      <div id="admin-guru-section" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2>Data Guru</h2>
+          <button class="btn btn-primary" onclick="showAddGuruModal()">➕ Tambah Guru</button>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Kode</th>
+                  <th>Nama Guru</th>
+                  <th>Mata Pelajaran</th>
+                  <th>Total Jam</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="guru-table-body">
+                <!-- Guru will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Section -->
+      <div id="admin-settings-section" style="display: none;">
+        <h2 style="margin-bottom: 20px;">Pengaturan Sistem</h2>
+        <div class="setting-group">
+          <h4>⚙️ Pengaturan Umum</h4>
+          <div class="form-group">
+            <label class="form-label">Nama Aplikasi</label>
+            <input type="text" id="app-name" value="Jadwal AI Pro">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Max Jam per Hari</label>
+            <input type="number" id="max-jam" value="12" min="6" max="15">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Default Sekolah</label>
+            <input type="text" id="default-sekolah" value="SMKN 2 Wonosari">
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <h4>🔐 Keamanan</h4>
+          <div class="form-group">
+            <label class="form-label">Session Timeout (menit)</label>
+            <input type="number" id="session-timeout" value="30">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Max Login Attempts</label>
+            <input type="number" id="max-attempts" value="5">
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <h4>📧 Notifikasi</h4>
+          <div class="form-group">
+            <label class="form-label">Email Notifikasi</label>
+            <input type="email" id="notif-email" value="admin@sekolah.com">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-success" onclick="saveSettings()">💾 Simpan Pengaturan</button>
+          <button class="btn btn-ghost" onclick="resetSettings()">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- Backup Section -->
+      <div id="admin-backup-section" style="display: none;">
+        <h2 style="margin-bottom: 20px;">Backup & Restore</h2>
         <div class="form-row form-row-2">
-          <div class="form-group">
-            <label class="form-label">Nama Sekolah</label>
-            <input type="text" id="nama-sekolah" placeholder="SMKN 2 Wonosari" value="SMKN 2 Wonosari">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-header-icon">💾</span>
+              <div><h2>Buat Backup</h2></div>
+            </div>
+            <div class="card-body">
+              <p style="margin-bottom: 20px;">Buat backup seluruh data sistem termasuk jadwal, guru, dan pengaturan.</p>
+              <button class="btn btn-primary" onclick="createBackup()">📥 Backup Sekarang</button>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Nama Kelas</label>
-            <input type="text" id="nama-kelas" placeholder="Contoh: XI TJKT 3" value="XI TJKT 3">
-          </div>
-        </div>
-        <div class="form-row form-row-2">
-          <div class="form-group">
-            <label class="form-label">Semester</label>
-            <input type="text" id="semester" placeholder="Semester 1" value="Semester 2">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Tanggal Mulai</label>
-            <input type="text" id="tgl-mulai" placeholder="Mulai 18 Juli 2022" value="Mulai 18 Juli 2022">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Jumlah Jam per Hari <span class="badge">Senin–Kamis</span></label>
-            <input type="number" id="jam-per-hari" value="10" min="6" max="12" style="max-width:120px;">
-            <p class="form-hint">Jumat otomatis menggunakan sisa kode</p>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-header-icon">↩️</span>
+              <div><h2>Restore Data</h2></div>
+            </div>
+            <div class="card-body">
+              <p style="margin-bottom: 20px;">Restore data dari file backup sebelumnya.</p>
+              <input type="file" id="restore-file" accept=".json" style="margin-bottom: 10px;">
+              <button class="btn btn-warning" onclick="restoreBackup()">↩️ Restore</button>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Step 2: Jam & Waktu -->
-    <div class="card" id="step2-card">
-      <div class="card-header">
-        <span class="card-header-icon">⏰</span>
-        <div><h2>Waktu Jam Pelajaran</h2><p>Opsional — isi waktu tiap jam</p></div>
-      </div>
-      <div class="card-body">
-        <div class="clear-jam-wrapper">
-          <input type="checkbox" id="clear-jam-checkbox" checked>
-          <label for="clear-jam-checkbox">Kosongkan semua jam (sembunyikan waktu)</label>
-        </div>
-        <div class="jam-config" id="jam-config-wrap"></div>
-      </div>
-    </div>
-
-    <!-- Step 3: Input Kode -->
-    <div class="card" id="step3-card">
-      <div class="card-header">
-        <span class="card-header-icon">📝</span>
-        <div><h2>Input Kode Guru</h2><p>Masukkan kode guru sesuai urutan jam</p></div>
-      </div>
-      <div class="card-body">
-        <div class="form-group" style="margin-bottom:16px;">
-          <label class="form-label">Kode Guru <span class="badge">Minimal 41 kode</span></label>
-          <textarea id="kodes" placeholder="Pisah spasi/koma. Contoh:&#10;Upcr DTK DTK END END YTS YTS G1 G1 G1&#10;GLS GLS NRM DRS DRS SGS SGS SGS IF1 IF1&#10;..."></textarea>
-          <p class="form-hint">Senin–Kamis: <strong id="hint-jam">10</strong> kode/hari · Jumat: sisanya</p>
-        </div>
-        <div class="counter-row" id="counter-row" style="display:none">
-          <div class="counter-chip" id="chip-total">📊 0 kode</div>
-          <div class="counter-chip" id="chip-seninkamis">Senin–Kamis: 0/40</div>
-          <div class="counter-chip" id="chip-jumat">Jumat: 0</div>
-          <div class="counter-chip" id="chip-status">⏳</div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-primary" onclick="generateJadwal()">✨ Buat Jadwal</button>
-          <button class="btn btn-ghost" onclick="clearForm()">🗑️ Reset</button>
-          <button class="btn btn-outline" onclick="loadContoh()">📋 Contoh Data</button>
-          <button class="btn btn-ai" onclick="aiOptimizeSchedule()">🤖 AI Optimasi</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Output -->
-    <div id="output-section">
-      <div class="output-toolbar">
-        <div class="output-title">
-          <h2 id="out-kelas-title"></h2>
-          <p id="out-subtitle"></p>
-        </div>
-        <div class="export-btns">
-          <button class="btn btn-ghost" onclick="showInputSection()">✏️ Edit</button>
-          <button class="btn btn-share" onclick="generateShareableLink()">🔗 Buat Link Share</button>
-          <button class="btn btn-success" onclick="downloadCSV()">📊 CSV</button>
-          <button class="btn btn-warning" onclick="downloadJPG()">🖼️ JPG</button>
-          <button class="btn btn-ai" onclick="showScheduleStats()">📈 Statistik</button>
+        <div class="card" style="margin-top: 20px;">
+          <div class="card-header">
+            <span class="card-header-icon">📋</span>
+            <div><h2>Riwayat Backup</h2></div>
+          </div>
+          <div class="card-body">
+            <div id="backup-history">
+              <!-- Backup history will be populated here -->
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Filter bar -->
-      <div class="filter-bar">
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="search-input" placeholder="Cari mapel, guru, kode..." oninput="renderGrid()">
-          <button class="clear-search" onclick="document.getElementById('search-input').value=''; renderGrid();">✖</button>
-        </div>
-        <select class="filter-select" id="filter-hari" onchange="renderGrid()">
-          <option value="">Semua Hari</option>
-          <option>Senin</option><option>Selasa</option><option>Rabu</option>
-          <option>Kamis</option><option>Jumat</option>
-        </select>
-        <div class="range-wrap">
-          <label for="font-size-slider">🔤 Ukuran:</label>
-          <input type="range" id="font-size-slider" min="0.8" max="1.5" step="0.1" value="1.0">
-          <span id="font-size-value">1.0rem</span>
-        </div>
-        <div class="time-toggle-wrap">
-          <input type="checkbox" id="show-time-row" onchange="renderGrid()">
-          <label for="show-time-row">⏲️ Tampilkan jam</label>
-        </div>
-      </div>
-
-      <!-- The printable grid area -->
-      <div id="jadwal-print-area">
-        <div class="jadwal-title-block">
-          <div class="jadwal-main-title" id="print-main-title"></div>
-          <div class="jadwal-kelas-name" id="print-kelas-name"></div>
-        </div>
-        <div class="sched-grid-wrap">
-          <table class="sched-grid" id="sched-grid-table"></table>
-        </div>
-        <div class="jadwal-footer">
-          <span id="footer-left"></span>
-          <span id="footer-right">Generated by Jadwal AI Pro</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tab Analytics -->
-  <div id="tab-analytics" style="display: none;">
-    <div class="card">
-      <div class="card-header">
-        <span class="card-header-icon">📊</span>
-        <div><h2>Analytics Dashboard</h2><p>Statistik dan analisis jadwal</p></div>
-      </div>
-      <div class="card-body">
-        <div class="stats-grid" id="stats-grid">
-          <!-- Stats will be populated here -->
-        </div>
-        <div style="margin-top: 30px;">
-          <canvas id="scheduleChart" style="width:100%; max-height:400px;"></canvas>
-        </div>
-        <div style="margin-top: 30px;">
-          <h4 style="margin-bottom: 16px;">🎯 Rekomendasi AI</h4>
-          <div id="ai-recommendations" class="quiz-container" style="background: var(--accent-light);">
-            <p>Generate jadwal terlebih dahulu untuk melihat rekomendasi AI</p>
+      <!-- Logs Section -->
+      <div id="admin-logs-section" style="display: none;">
+        <h2 style="margin-bottom: 20px;">Activity Logs</h2>
+        <div class="card">
+          <div class="card-body">
+            <div class="activity-log" id="full-activity-log" style="max-height: 500px;">
+              <!-- Full logs will be populated here -->
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Tab Quiz Mode -->
-  <div id="tab-quiz" style="display: none;">
-    <div class="card">
-      <div class="card-header">
-        <span class="card-header-icon">🎮</span>
-        <div><h2>Quiz Mode</h2><p>Tebak jadwal untuk membantu menghafal</p></div>
-      </div>
-      <div class="card-body">
-        <div class="quiz-container" id="quiz-container">
-          <div class="quiz-question" id="quiz-question">Generate jadwal untuk memulai quiz</div>
-          <div class="quiz-options" id="quiz-options"></div>
-          <div style="margin-top: 20px; text-align: center;">
-            <span id="quiz-score" style="font-weight: 700; color: var(--accent);">Score: 0</span>
-          </div>
-          <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <button class="btn btn-primary" onclick="startQuiz()">🎮 Mulai Quiz</button>
-            <button class="btn btn-ghost" onclick="nextQuizQuestion()">⏭️ Soal Berikutnya</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tab Themes -->
-  <div id="tab-themes" style="display: none;">
-    <div class="card">
-      <div class="card-header">
-        <span class="card-header-icon">🎨</span>
-        <div><h2>Color Themes</h2><p>Pilih tema warna untuk jadwal</p></div>
-      </div>
-      <div class="card-body">
-        <div class="theme-picker">
-          <div class="theme-color" style="background: #2563eb;" onclick="changeTheme('blue')" title="Blue"></div>
-          <div class="theme-color" style="background: #059669;" onclick="changeTheme('green')" title="Green"></div>
-          <div class="theme-color" style="background: #8b5cf6;" onclick="changeTheme('purple')" title="Purple"></div>
-          <div class="theme-color" style="background: #d97706;" onclick="changeTheme('orange')" title="Orange"></div>
-          <div class="theme-color" style="background: #dc2626;" onclick="changeTheme('red')" title="Red"></div>
-          <div class="theme-color" style="background: #ec4899;" onclick="changeTheme('pink')" title="Pink"></div>
-        </div>
-        
-        <h4 style="margin: 30px 0 16px;">📱 QR Code Jadwal</h4>
-        <div class="qr-container" id="qr-container">
-          <div class="qr-code" id="qr-code">
-            <!-- QR Code akan digenerate di sini -->
-          </div>
-        </div>
-        <p style="text-align: center; margin-top: 8px;" id="qr-status">Klik tombol di bawah untuk generate QR Code</p>
-        <div style="text-align: center; margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-          <button class="btn btn-primary" onclick="generateQRCode()">📱 Generate QR Code</button>
-          <button class="btn btn-outline" onclick="downloadQRCode()">💾 Download QR Code</button>
-        </div>
-
-        <h4 style="margin: 30px 0 16px;">🔔 Pengingat Jadwal</h4>
-        <div class="quiz-container" style="background: var(--accent-light);">
-          <div style="margin-bottom: 16px;">
-            <label class="form-label">Set Pengingat (menit sebelum jam)</label>
-            <input type="number" id="reminder-minutes" value="5" min="1" max="60" style="width: 100px;">
-          </div>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button class="btn btn-success" onclick="setReminder()">⏰ Set Pengingat</button>
-            <button class="btn btn-ghost" onclick="clearReminder()">🗑️ Hapus</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</main>
-
-<div id="toast"></div>
+</div>
 
 <!-- Modal Share -->
 <div id="share-modal" class="modal">
@@ -870,49 +1415,57 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   </div>
 </div>
 
-<!-- MODAL ADMIN DASHBOARD (BARU) -->
-<div id="admin-modal" class="modal">
-  <div class="modal-content" style="max-width: 700px;">
-    <span class="close-btn" onclick="closeAdminModal()">&times;</span>
+<!-- Modal Add User -->
+<div id="add-user-modal" class="modal">
+  <div class="modal-content" style="max-width: 400px;">
+    <span class="close-btn" onclick="closeAddUserModal()">&times;</span>
     <div class="modal-body">
-      <h3>👑 Admin Dashboard</h3>
-      <p style="margin-bottom: 24px; color: var(--accent); font-weight: 600;">Pengelolaan Data & Statistik Sistem</p>
-      
-      <!-- Kartu Statistik Admin -->
-      <div class="stats-grid" style="grid-template-columns: repeat(2,1fr);">
-        <div class="stat-card">
-          <div class="stat-icon">📋</div>
-          <div class="stat-value" id="admin-total-schedules">0</div>
-          <div class="stat-label">Total Jadwal Tersimpan</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">👥</div>
-          <div class="stat-value" id="admin-total-guru">0</div>
-          <div class="stat-label">Guru Terdaftar</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">📚</div>
-          <div class="stat-value" id="admin-total-mapel">0</div>
-          <div class="stat-label">Mata Pelajaran</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">💾</div>
-          <div class="stat-value" id="admin-storage-size">0 KB</div>
-          <div class="stat-label">Penyimpanan Lokal</div>
-        </div>
+      <h3>➕ Tambah User Baru</h3>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="new-username" placeholder="Username">
       </div>
-      
-      <!-- Data tersimpan (shared) -->
-      <h4 style="margin: 30px 0 16px;">📦 Data Jadwal Tersimpan (Share)</h4>
-      <div id="admin-shared-list" style="max-height:200px; overflow-y:auto; border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; background:var(--surface2);">
-        <p class="text-muted">Memuat...</p>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="new-password" placeholder="Password">
       </div>
-      
-      <!-- Aksi admin -->
-      <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; flex-wrap: wrap;">
-        <button class="btn btn-danger" onclick="adminClearAllShares()">🗑️ Hapus Semua Data Tersimpan</button>
-        <button class="btn btn-ghost" onclick="exportAdminLogs()">📄 Ekspor Log</button>
-        <button class="btn btn-outline" onclick="closeAdminModal()">Tutup</button>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="new-role">
+          <option value="admin">Admin</option>
+          <option value="operator">Operator</option>
+          <option value="viewer">Viewer</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+        <button class="btn btn-primary" onclick="addUser()">Simpan</button>
+        <button class="btn btn-ghost" onclick="closeAddUserModal()">Batal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Add Guru -->
+<div id="add-guru-modal" class="modal">
+  <div class="modal-content" style="max-width: 400px;">
+    <span class="close-btn" onclick="closeAddGuruModal()">&times;</span>
+    <div class="modal-body">
+      <h3>➕ Tambah Guru Baru</h3>
+      <div class="form-group">
+        <label>Kode Guru</label>
+        <input type="text" id="new-kode" placeholder="Contoh: T8">
+      </div>
+      <div class="form-group">
+        <label>Nama Guru</label>
+        <input type="text" id="new-nama" placeholder="Nama lengkap">
+      </div>
+      <div class="form-group">
+        <label>Mata Pelajaran</label>
+        <input type="text" id="new-mapel" placeholder="Contoh: Matematika">
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+        <button class="btn btn-primary" onclick="addGuru()">Simpan</button>
+        <button class="btn btn-ghost" onclick="closeAddGuruModal()">Batal</button>
       </div>
     </div>
   </div>
@@ -937,9 +1490,11 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   </div>
 </div>
 
+<div id="toast"></div>
+
 <script>
 // ================== KODE GURU ==================
-const kodeGuru = {
+let kodeGuru = {
   "A1": { nama: "Dra. Siti Rahayu", mapel: "PA. Islam" },
   "A2": { nama: "Dwi Sidik Purnomo", mapel: "PA. Islam" },
   "A3": { nama: "Akhmad Affandi", mapel: "PA. Islam" },
@@ -1018,6 +1573,18 @@ const kodeGuru = {
   "KBN": { nama: "Khi", mapel: "Krida" }
 };
 
+// ================== DATA ADMIN ==================
+let users = [
+  { id: 1, username: 'admin', password: 'admin123', role: 'admin', status: 'active', lastLogin: '2024-03-15 10:30' },
+  { id: 2, username: 'operator', password: 'operator123', role: 'operator', status: 'active', lastLogin: '2024-03-15 09:15' },
+  { id: 3, username: 'viewer', password: 'viewer123', role: 'viewer', status: 'inactive', lastLogin: '2024-03-14 16:20' }
+];
+
+let activityLogs = [];
+let savedJadwal = [];
+let currentUser = null;
+
+// ================== KONSTANTA ==================
 const HARI = ['Senin','Selasa','Rabu','Kamis','Jumat'];
 let scheduleData = [];
 let defaultJamTimes = [];
@@ -1034,33 +1601,568 @@ let currentQuestion = 0;
 
 // Chart instance
 let scheduleChart = null;
+let usageChart = null;
 
-// ── Tab Switching ──
-function switchTab(tabName, element) {
-  // Hide all tabs
-  document.getElementById('tab-editor').style.display = 'none';
-  document.getElementById('tab-analytics').style.display = 'none';
-  document.getElementById('tab-quiz').style.display = 'none';
-  document.getElementById('tab-themes').style.display = 'none';
+// ================== FUNGSI LOGIN ==================
+function login() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
   
-  // Remove active class from all tabs
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const user = users.find(u => u.username === username && u.password === password);
   
-  // Show selected tab
-  document.getElementById(`tab-${tabName}`).style.display = 'block';
-  
-  // Add active class to clicked tab
-  if (element) element.classList.add('active');
-  
-  // Update content for specific tabs
-  if (tabName === 'analytics' && scheduleData.length > 0) {
-    updateAnalytics();
-  } else if (tabName === 'quiz' && scheduleData.length > 0) {
-    prepareQuiz();
+  if (user) {
+    currentUser = user;
+    user.lastLogin = new Date().toLocaleString('id-ID');
+    
+    // Log activity
+    addActivityLog('Login', `User ${username} login ke sistem`);
+    
+    // Sembunyikan login, tampilkan admin dashboard
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('admin-dashboard').style.display = 'block';
+    
+    // Update admin dashboard
+    updateAdminDashboard();
+    updateUsersTable();
+    updateGuruTable();
+    updateJadwalTable();
+    updateActivityLogs();
+    updateBackupHistory();
+    
+    showToast(`👋 Selamat datang, ${username}!`);
+  } else {
+    showToast('❌ Username atau password salah!');
   }
 }
 
-// ── Dark mode ──
+function logout() {
+  if (currentUser) {
+    addActivityLog('Logout', `User ${currentUser.username} logout dari sistem`);
+  }
+  currentUser = null;
+  document.getElementById('admin-dashboard').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+  showToast('👋 Berhasil logout');
+}
+
+function showAdminLogin() {
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+}
+
+function showMainApp() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('main-app').style.display = 'block';
+  document.getElementById('admin-dashboard').style.display = 'none';
+}
+
+// ================== FUNGSI ADMIN ==================
+function showAdminSection(section, element) {
+  // Hide all sections
+  document.getElementById('admin-dashboard-section').style.display = 'none';
+  document.getElementById('admin-users-section').style.display = 'none';
+  document.getElementById('admin-jadwal-section').style.display = 'none';
+  document.getElementById('admin-guru-section').style.display = 'none';
+  document.getElementById('admin-settings-section').style.display = 'none';
+  document.getElementById('admin-backup-section').style.display = 'none';
+  document.getElementById('admin-logs-section').style.display = 'none';
+  
+  // Remove active class from all menu items
+  document.querySelectorAll('.admin-menu a').forEach(a => a.classList.remove('active'));
+  
+  // Show selected section
+  document.getElementById(`admin-${section}-section`).style.display = 'block';
+  
+  // Add active class to clicked menu
+  if (element) element.classList.add('active');
+  
+  // Update specific sections
+  if (section === 'dashboard') updateAdminDashboard();
+  if (section === 'users') updateUsersTable();
+  if (section === 'guru') updateGuruTable();
+  if (section === 'jadwal') updateJadwalTable();
+  if (section === 'logs') updateActivityLogs();
+  if (section === 'backup') updateBackupHistory();
+}
+
+function updateAdminDashboard() {
+  // Update stats
+  document.getElementById('total-jadwal').textContent = savedJadwal.length;
+  document.getElementById('total-guru').textContent = Object.keys(kodeGuru).length;
+  document.getElementById('total-mapel').textContent = [...new Set(Object.values(kodeGuru).map(g => g.mapel).filter(Boolean))].length;
+  
+  // Update usage chart
+  const ctx = document.getElementById('usageChart').getContext('2d');
+  if (usageChart) usageChart.destroy();
+  
+  usageChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+      datasets: [{
+        label: 'Pengguna Aktif',
+        data: [65, 59, 80, 81, 56, 55, 40],
+        borderColor: '#2563eb',
+        tension: 0.4,
+        fill: false
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+}
+
+function updateUsersTable() {
+  const tbody = document.getElementById('users-table-body');
+  tbody.innerHTML = '';
+  
+  users.forEach(user => {
+    const statusClass = user.status === 'active' ? 'badge-success' : 'badge-danger';
+    const statusText = user.status === 'active' ? 'Aktif' : 'Nonaktif';
+    
+    tbody.innerHTML += `
+      <tr>
+        <td>${user.id}</td>
+        <td>${user.username}</td>
+        <td>${user.role}</td>
+        <td><span class="admin-badge ${statusClass}">${statusText}</span></td>
+        <td>${user.lastLogin}</td>
+        <td>
+          <button class="btn-icon" onclick="editUser(${user.id})" title="Edit">✏️</button>
+          <button class="btn-icon" onclick="deleteUser(${user.id})" title="Hapus">🗑️</button>
+          <button class="btn-icon" onclick="toggleUserStatus(${user.id})" title="Toggle Status">🔁</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function updateGuruTable() {
+  const tbody = document.getElementById('guru-table-body');
+  tbody.innerHTML = '';
+  
+  // Hitung total jam per guru
+  const guruJam = {};
+  if (scheduleData.length > 0) {
+    scheduleData.forEach(day => {
+      day.kodes.forEach(kode => {
+        if (kodeGuru[kode] && kodeGuru[kode].nama) {
+          guruJam[kode] = (guruJam[kode] || 0) + 1;
+        }
+      });
+    });
+  }
+  
+  Object.entries(kodeGuru).forEach(([kode, data]) => {
+    if (data.nama) { // Hanya tampilkan guru yang punya nama
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${kode}</strong></td>
+          <td>${data.nama}</td>
+          <td>${data.mapel}</td>
+          <td>${guruJam[kode] || 0} jam</td>
+          <td>
+            <button class="btn-icon" onclick="editGuru('${kode}')" title="Edit">✏️</button>
+            <button class="btn-icon" onclick="deleteGuru('${kode}')" title="Hapus">🗑️</button>
+          </td>
+        </tr>
+      `;
+    }
+  });
+}
+
+function updateJadwalTable() {
+  const tbody = document.getElementById('jadwal-table-body');
+  tbody.innerHTML = '';
+  
+  // Ambil jadwal dari localStorage
+  const sharedData = JSON.parse(localStorage.getItem(SHARED_DATA_KEY) || '{}');
+  
+  Object.entries(sharedData).forEach(([id, data]) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${id.substring(0, 8)}...</td>
+        <td>${data.sekolah || '-'}</td>
+        <td>${data.kelas || '-'}</td>
+        <td>${data.semester || '-'}</td>
+        <td>${data.jamPerHari ? data.jamPerHari * 5 : 0} jam</td>
+        <td>${new Date(data.timestamp).toLocaleDateString('id-ID')}</td>
+        <td>
+          <button class="btn-icon" onclick="previewJadwalAdmin('${id}')" title="Preview">👁️</button>
+          <button class="btn-icon" onclick="deleteJadwalAdmin('${id}')" title="Hapus">🗑️</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function updateActivityLogs() {
+  const logContainer = document.getElementById('activity-log');
+  const fullLogContainer = document.getElementById('full-activity-log');
+  
+  let logHtml = '';
+  activityLogs.slice(0, 10).forEach(log => {
+    logHtml += `
+      <div class="log-item">
+        <span class="log-time">${log.time}</span>
+        <span class="log-event">${log.event}</span>
+        <span class="log-user">${log.user}</span>
+      </div>
+    `;
+  });
+  logContainer.innerHTML = logHtml || '<p style="text-align:center; color:var(--text2);">Belum ada aktivitas</p>';
+  
+  let fullLogHtml = '';
+  activityLogs.forEach(log => {
+    fullLogHtml += `
+      <div class="log-item">
+        <span class="log-time">${log.time}</span>
+        <span class="log-event">${log.event}</span>
+        <span class="log-user">${log.user}</span>
+      </div>
+    `;
+  });
+  fullLogContainer.innerHTML = fullLogHtml || '<p style="text-align:center; color:var(--text2);">Belum ada aktivitas</p>';
+}
+
+function updateBackupHistory() {
+  const backupHistory = document.getElementById('backup-history');
+  const backups = JSON.parse(localStorage.getItem('backupHistory') || '[]');
+  
+  let html = '';
+  backups.forEach((backup, index) => {
+    html += `
+      <div class="backup-item">
+        <div class="backup-info">
+          <span class="backup-name">Backup #${index + 1}</span>
+          <span class="backup-date">${backup.date} • Ukuran: ${backup.size}</span>
+        </div>
+        <div class="backup-actions">
+          <button class="btn-icon" onclick="downloadBackup('${backup.id}')" title="Download">💾</button>
+          <button class="btn-icon" onclick="restoreBackup('${backup.id}')" title="Restore">↩️</button>
+          <button class="btn-icon" onclick="deleteBackup('${backup.id}')" title="Hapus">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+  
+  backupHistory.innerHTML = html || '<p style="text-align:center; color:var(--text2);">Belum ada backup</p>';
+}
+
+function addActivityLog(event, detail) {
+  const log = {
+    time: new Date().toLocaleTimeString('id-ID'),
+    event: detail,
+    user: currentUser ? currentUser.username : 'system'
+  };
+  activityLogs.unshift(log);
+  if (activityLogs.length > 100) activityLogs.pop();
+}
+
+// ================== FUNGSI CRUD USER ==================
+function showAddUserModal() {
+  document.getElementById('add-user-modal').style.display = 'flex';
+}
+
+function closeAddUserModal() {
+  document.getElementById('add-user-modal').style.display = 'none';
+  document.getElementById('new-username').value = '';
+  document.getElementById('new-password').value = '';
+}
+
+function addUser() {
+  const username = document.getElementById('new-username').value;
+  const password = document.getElementById('new-password').value;
+  const role = document.getElementById('new-role').value;
+  
+  if (!username || !password) {
+    showToast('❌ Username dan password harus diisi');
+    return;
+  }
+  
+  const newId = Math.max(...users.map(u => u.id)) + 1;
+  users.push({
+    id: newId,
+    username,
+    password,
+    role,
+    status: 'active',
+    lastLogin: '-'
+  });
+  
+  addActivityLog('Tambah User', `User ${username} ditambahkan`);
+  updateUsersTable();
+  closeAddUserModal();
+  showToast('✅ User berhasil ditambahkan');
+}
+
+function editUser(id) {
+  const user = users.find(u => u.id === id);
+  if (user) {
+    const newUsername = prompt('Edit username:', user.username);
+    if (newUsername) {
+      user.username = newUsername;
+      addActivityLog('Edit User', `User ID ${id} diubah`);
+      updateUsersTable();
+      showToast('✅ User berhasil diupdate');
+    }
+  }
+}
+
+function deleteUser(id) {
+  if (confirm('Yakin ingin menghapus user ini?')) {
+    const user = users.find(u => u.id === id);
+    users = users.filter(u => u.id !== id);
+    addActivityLog('Hapus User', `User ${user.username} dihapus`);
+    updateUsersTable();
+    showToast('✅ User berhasil dihapus');
+  }
+}
+
+function toggleUserStatus(id) {
+  const user = users.find(u => u.id === id);
+  if (user) {
+    user.status = user.status === 'active' ? 'inactive' : 'active';
+    addActivityLog('Ubah Status', `User ${user.username} status menjadi ${user.status}`);
+    updateUsersTable();
+    showToast(`✅ Status user diubah menjadi ${user.status}`);
+  }
+}
+
+// ================== FUNGSI CRUD GURU ==================
+function showAddGuruModal() {
+  document.getElementById('add-guru-modal').style.display = 'flex';
+}
+
+function closeAddGuruModal() {
+  document.getElementById('add-guru-modal').style.display = 'none';
+  document.getElementById('new-kode').value = '';
+  document.getElementById('new-nama').value = '';
+  document.getElementById('new-mapel').value = '';
+}
+
+function addGuru() {
+  const kode = document.getElementById('new-kode').value.toUpperCase();
+  const nama = document.getElementById('new-nama').value;
+  const mapel = document.getElementById('new-mapel').value;
+  
+  if (!kode || !nama || !mapel) {
+    showToast('❌ Semua field harus diisi');
+    return;
+  }
+  
+  if (kodeGuru[kode]) {
+    showToast('❌ Kode guru sudah ada');
+    return;
+  }
+  
+  kodeGuru[kode] = { nama, mapel };
+  addActivityLog('Tambah Guru', `Guru ${nama} (${kode}) ditambahkan`);
+  updateGuruTable();
+  closeAddGuruModal();
+  showToast('✅ Guru berhasil ditambahkan');
+}
+
+function editGuru(kode) {
+  const guru = kodeGuru[kode];
+  if (guru) {
+    const newNama = prompt('Edit nama guru:', guru.nama);
+    const newMapel = prompt('Edit mata pelajaran:', guru.mapel);
+    if (newNama && newMapel) {
+      kodeGuru[kode] = { nama: newNama, mapel: newMapel };
+      addActivityLog('Edit Guru', `Guru ${kode} diubah`);
+      updateGuruTable();
+      showToast('✅ Guru berhasil diupdate');
+    }
+  }
+}
+
+function deleteGuru(kode) {
+  if (confirm(`Yakin ingin menghapus guru ${kode}?`)) {
+    const guru = kodeGuru[kode];
+    delete kodeGuru[kode];
+    addActivityLog('Hapus Guru', `Guru ${guru.nama} (${kode}) dihapus`);
+    updateGuruTable();
+    showToast('✅ Guru berhasil dihapus');
+  }
+}
+
+// ================== FUNGSI JADWAL ADMIN ==================
+function previewJadwalAdmin(id) {
+  const sharedImages = JSON.parse(localStorage.getItem(SHARED_IMAGES_KEY) || '{}');
+  const imageDataUrl = sharedImages[id];
+  
+  if (imageDataUrl) {
+    const previewWindow = window.open('', '_blank');
+    previewWindow.document.write(`
+      <html>
+        <head><title>Preview Jadwal</title></head>
+        <body style="margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#f0f0f0;">
+          <img src="${imageDataUrl}" style="max-width:100%; max-height:100vh; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+        </body>
+      </html>
+    `);
+  }
+}
+
+function deleteJadwalAdmin(id) {
+  if (confirm('Yakin ingin menghapus jadwal ini?')) {
+    const sharedImages = JSON.parse(localStorage.getItem(SHARED_IMAGES_KEY) || '{}');
+    const sharedData = JSON.parse(localStorage.getItem(SHARED_DATA_KEY) || '{}');
+    
+    delete sharedImages[id];
+    delete sharedData[id];
+    
+    localStorage.setItem(SHARED_IMAGES_KEY, JSON.stringify(sharedImages));
+    localStorage.setItem(SHARED_DATA_KEY, JSON.stringify(sharedData));
+    
+    addActivityLog('Hapus Jadwal', `Jadwal ID ${id.substring(0,8)}... dihapus`);
+    updateJadwalTable();
+    showToast('✅ Jadwal berhasil dihapus');
+  }
+}
+
+function searchJadwalAdmin() {
+  const query = document.getElementById('search-jadwal-admin').value.toLowerCase();
+  const tbody = document.getElementById('jadwal-table-body');
+  const sharedData = JSON.parse(localStorage.getItem(SHARED_DATA_KEY) || '{}');
+  
+  tbody.innerHTML = '';
+  
+  Object.entries(sharedData).forEach(([id, data]) => {
+    if (data.sekolah?.toLowerCase().includes(query) || 
+        data.kelas?.toLowerCase().includes(query) ||
+        data.semester?.toLowerCase().includes(query)) {
+      tbody.innerHTML += `
+        <tr>
+          <td>${id.substring(0, 8)}...</td>
+          <td>${data.sekolah || '-'}</td>
+          <td>${data.kelas || '-'}</td>
+          <td>${data.semester || '-'}</td>
+          <td>${data.jamPerHari ? data.jamPerHari * 5 : 0} jam</td>
+          <td>${new Date(data.timestamp).toLocaleDateString('id-ID')}</td>
+          <td>
+            <button class="btn-icon" onclick="previewJadwalAdmin('${id}')" title="Preview">👁️</button>
+            <button class="btn-icon" onclick="deleteJadwalAdmin('${id}')" title="Hapus">🗑️</button>
+          </td>
+        </tr>
+      `;
+    }
+  });
+}
+
+// ================== FUNGSI BACKUP ==================
+function createBackup() {
+  const backup = {
+    id: Date.now().toString(36),
+    date: new Date().toLocaleString('id-ID'),
+    size: '2.3 MB',
+    data: {
+      users,
+      kodeGuru,
+      savedJadwal,
+      settings: {
+        appName: document.getElementById('app-name')?.value || 'Jadwal AI Pro',
+        maxJam: document.getElementById('max-jam')?.value || 12,
+        defaultSekolah: document.getElementById('default-sekolah')?.value || 'SMKN 2 Wonosari'
+      }
+    }
+  };
+  
+  const backups = JSON.parse(localStorage.getItem('backupHistory') || '[]');
+  backups.unshift(backup);
+  localStorage.setItem('backupHistory', JSON.stringify(backups));
+  
+  // Download backup file
+  const blob = new Blob([JSON.stringify(backup.data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `backup-${backup.date.replace(/[\/, ]/g, '-')}.json`;
+  a.click();
+  
+  addActivityLog('Backup', 'Membuat backup sistem');
+  updateBackupHistory();
+  showToast('✅ Backup berhasil dibuat');
+}
+
+function restoreBackup() {
+  const file = document.getElementById('restore-file').files[0];
+  if (!file) {
+    showToast('❌ Pilih file backup terlebih dahulu');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      
+      if (confirm('Yakin ingin merestore data? Data yang ada sekarang akan ditimpa.')) {
+        if (data.users) users = data.users;
+        if (data.kodeGuru) kodeGuru = data.kodeGuru;
+        if (data.savedJadwal) savedJadwal = data.savedJadwal;
+        
+        addActivityLog('Restore', 'Merestore data dari backup');
+        updateUsersTable();
+        updateGuruTable();
+        showToast('✅ Restore berhasil');
+      }
+    } catch (error) {
+      showToast('❌ File backup tidak valid');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function downloadBackup(id) {
+  const backups = JSON.parse(localStorage.getItem('backupHistory') || '[]');
+  const backup = backups.find(b => b.id === id);
+  
+  if (backup) {
+    const blob = new Blob([JSON.stringify(backup.data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `backup-${backup.date.replace(/[\/, ]/g, '-')}.json`;
+    a.click();
+    showToast('✅ File backup diunduh');
+  }
+}
+
+function deleteBackup(id) {
+  if (confirm('Yakin ingin menghapus backup ini?')) {
+    const backups = JSON.parse(localStorage.getItem('backupHistory') || '[]');
+    const newBackups = backups.filter(b => b.id !== id);
+    localStorage.setItem('backupHistory', JSON.stringify(newBackups));
+    updateBackupHistory();
+    showToast('✅ Backup dihapus');
+  }
+}
+
+// ================== FUNGSI SETTINGS ==================
+function saveSettings() {
+  addActivityLog('Settings', 'Mengubah pengaturan sistem');
+  showToast('✅ Pengaturan disimpan');
+}
+
+function resetSettings() {
+  if (confirm('Reset semua pengaturan ke default?')) {
+    document.getElementById('app-name').value = 'Jadwal AI Pro';
+    document.getElementById('max-jam').value = '12';
+    document.getElementById('default-sekolah').value = 'SMKN 2 Wonosari';
+    document.getElementById('session-timeout').value = '30';
+    document.getElementById('max-attempts').value = '5';
+    document.getElementById('notif-email').value = 'admin@sekolah.com';
+    showToast('✅ Pengaturan direset');
+  }
+}
+
+// ================== DARK MODE ==================
 document.getElementById('theme-toggle').onclick = () => {
   const html = document.documentElement;
   const isDark = html.getAttribute('data-theme') === 'dark';
@@ -1068,26 +2170,70 @@ document.getElementById('theme-toggle').onclick = () => {
   document.getElementById('theme-toggle').textContent = isDark ? '🌙' : '☀️';
 };
 
-// ── Theme Changer ──
-function changeTheme(color) {
-  const root = document.documentElement;
-  const themes = {
-    blue: { accent: '#2563eb', accent2: '#1d4ed8' },
-    green: { accent: '#059669', accent2: '#047857' },
-    purple: { accent: '#8b5cf6', accent2: '#7c3aed' },
-    orange: { accent: '#d97706', accent2: '#b45309' },
-    red: { accent: '#dc2626', accent2: '#b91c1c' },
-    pink: { accent: '#ec4899', accent2: '#db2777' }
-  };
-  
-  if (themes[color]) {
-    root.style.setProperty('--accent', themes[color].accent);
-    root.style.setProperty('--accent2', themes[color].accent2);
-    showToast(`🎨 Tema ${color} diterapkan!`);
+// ================== FUNGSI QR CODE ==================
+function generateQRCode() {
+  if (scheduleData.length === 0) {
+    showToast('⚠️ Generate jadwal terlebih dahulu');
+    return;
   }
+  
+  showToast('📱 Membuat QR Code...');
+  
+  const kelas = document.getElementById('nama-kelas').value || 'Kelas';
+  const sekolah = document.getElementById('nama-sekolah').value || 'Sekolah';
+  const qrContent = `Jadwal ${kelas} - ${sekolah}\nTotal Jam: ${scheduleData.flatMap(d => d.kodes).length}\nGenerated: ${new Date().toLocaleDateString('id-ID')}`;
+  
+  const qrContainer = document.getElementById('qr-code');
+  qrContainer.innerHTML = '';
+  
+  const canvas = document.createElement('canvas');
+  
+  QRCode.toCanvas(canvas, qrContent, { 
+    width: 200,
+    margin: 2,
+    color: {
+      dark: '#000000',
+      light: '#ffffff'
+    }
+  }, function(error) {
+    if (error) {
+      console.error(error);
+      showToast('❌ Gagal membuat QR Code');
+      qrContainer.innerHTML = `<div style="padding:20px; background:#f0f0f0; border-radius:8px;">
+        <p style="font-weight:600;">QR Code Generator</p>
+        <p style="font-size:0.8rem;">${qrContent.substring(0, 50)}...</p>
+      </div>`;
+    } else {
+      qrContainer.innerHTML = '';
+      qrContainer.appendChild(canvas);
+      document.getElementById('qr-status').textContent = '✅ QR Code siap! Scan untuk lihat info jadwal';
+      showToast('✅ QR Code berhasil dibuat!');
+    }
+  });
+  
+  window.currentQRContent = qrContent;
+  window.currentQRCanvas = canvas;
 }
 
-// ── Jam config builder ──
+function downloadQRCode() {
+  if (!window.currentQRCanvas) {
+    showToast('⚠️ Generate QR Code terlebih dahulu');
+    return;
+  }
+  
+  const link = document.createElement('a');
+  link.download = `QR-Jadwal-${document.getElementById('nama-kelas').value || 'Kelas'}.png`;
+  link.href = window.currentQRCanvas.toDataURL('image/png');
+  link.click();
+  showToast('✅ QR Code diunduh!');
+}
+
+function shareQRCode() {
+  generateQRCode();
+  showToast('📱 QR Code siap, scan untuk lihat info');
+}
+
+// ================== JAM CONFIG ==================
 function buildJamConfig() {
   const n = parseInt(document.getElementById('jam-per-hari').value) || 10;
   document.getElementById('hint-jam').textContent = n;
@@ -1132,7 +2278,7 @@ document.getElementById('jam-per-hari').addEventListener('input', function() {
   }
 });
 
-// ── Counter ──
+// ================== COUNTER ==================
 document.getElementById('kodes').addEventListener('input', function() {
   const kodes = this.value.trim().split(/[\s,]+/).filter(Boolean);
   const n = kodes.length;
@@ -1149,7 +2295,7 @@ document.getElementById('kodes').addEventListener('input', function() {
   else { s.textContent = `⚠️ Kurang ${(need+1)-n}`; s.className = 'counter-chip warn'; }
 });
 
-// ── AI Optimasi Jadwal ──
+// ================== AI OPTIMASI ==================
 function aiOptimizeSchedule() {
   const kodes = document.getElementById('kodes').value.trim().split(/[\s,]+/).filter(Boolean);
   if (kodes.length < 41) {
@@ -1159,12 +2305,10 @@ function aiOptimizeSchedule() {
   
   showToast('🤖 AI sedang mengoptimasi jadwal...');
   
-  // Simulasi AI optimization - mengelompokkan kode yang sama
   setTimeout(() => {
     const optimized = [];
     const jamPerHari = parseInt(document.getElementById('jam-per-hari').value) || 10;
     
-    // Kelompokkan kode yang sama
     let i = 0;
     while (i < kodes.length) {
       const current = kodes[i];
@@ -1184,7 +2328,7 @@ function aiOptimizeSchedule() {
   }, 1500);
 }
 
-// ── Generate Jadwal ──
+// ================== GENERATE JADWAL ==================
 function generateJadwal() {
   const input = document.getElementById('kodes').value.trim();
   const kodes = input.split(/[\s,]+/).filter(Boolean);
@@ -1220,9 +2364,12 @@ function generateJadwal() {
   document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
   showToast('✅ Jadwal berhasil dibuat!');
   
-  // Update analytics if tab is active
   if (document.getElementById('tab-analytics').style.display === 'block') {
     updateAnalytics();
+  }
+  
+  if (currentUser) {
+    addActivityLog('Generate Jadwal', `Membuat jadwal baru untuk ${document.getElementById('nama-kelas').value}`);
   }
 }
 
@@ -1326,7 +2473,7 @@ function getSpecialClass(kode) {
 
 document.getElementById('font-size-slider').addEventListener('input', renderGrid);
 
-// ── Fungsi Capture ──
+// ================== CAPTURE ==================
 function captureElementFull(element) {
   return new Promise((resolve, reject) => {
     const clone = element.cloneNode(true);
@@ -1357,7 +2504,7 @@ function captureElementFull(element) {
   });
 }
 
-// ── Download JPG ──
+// ================== DOWNLOAD JPG ==================
 function downloadJPG() {
   if (scheduleData.length === 0) {
     showToast('❌ Buat jadwal terlebih dahulu');
@@ -1471,11 +2618,10 @@ function loadContoh() {
   generateJadwal();
 }
 
-// === FITUR ANALYTICS ===
+// ================== ANALYTICS ==================
 function updateAnalytics() {
   if (scheduleData.length === 0) return;
   
-  // Hitung statistik
   const allKodes = scheduleData.flatMap(d => d.kodes);
   const uniqueMapel = new Set();
   const guruCount = {};
@@ -1490,7 +2636,6 @@ function updateAnalytics() {
     mapelCount[info.mapel] = (mapelCount[info.mapel] || 0) + 1;
   });
   
-  // Update stats grid
   const statsGrid = document.getElementById('stats-grid');
   statsGrid.innerHTML = `
     <div class="stat-card">
@@ -1515,7 +2660,6 @@ function updateAnalytics() {
     </div>
   `;
   
-  // Update chart
   const ctx = document.getElementById('scheduleChart').getContext('2d');
   if (scheduleChart) scheduleChart.destroy();
   
@@ -1543,7 +2687,6 @@ function updateAnalytics() {
     }
   });
   
-  // Update AI recommendations
   const recommendations = document.getElementById('ai-recommendations');
   const mostFrequentMapel = Object.entries(mapelCount).sort((a,b) => b[1] - a[1])[0];
   const leastFrequentMapel = Object.entries(mapelCount).sort((a,b) => a[1] - b[1])[0];
@@ -1560,7 +2703,7 @@ function updateAnalytics() {
   `;
 }
 
-// === FITUR QUIZ ===
+// ================== QUIZ ==================
 function prepareQuiz() {
   if (scheduleData.length === 0) {
     showToast('⚠️ Generate jadwal terlebih dahulu');
@@ -1579,7 +2722,6 @@ function prepareQuiz() {
     });
   });
   
-  // Shuffle questions
   quizQuestions = quizQuestions.sort(() => Math.random() - 0.5).slice(0, 10);
 }
 
@@ -1655,77 +2797,30 @@ function nextQuizQuestion() {
   }
 }
 
-// === FITUR QR CODE ===
-function generateQRCode() {
-  if (scheduleData.length === 0) {
-    showToast('⚠️ Generate jadwal terlebih dahulu');
-    return;
-  }
+// ================== THEME ==================
+function changeTheme(color) {
+  const root = document.documentElement;
+  const themes = {
+    blue: { accent: '#2563eb', accent2: '#1d4ed8' },
+    green: { accent: '#059669', accent2: '#047857' },
+    purple: { accent: '#8b5cf6', accent2: '#7c3aed' },
+    orange: { accent: '#d97706', accent2: '#b45309' },
+    red: { accent: '#dc2626', accent2: '#b91c1c' },
+    pink: { accent: '#ec4899', accent2: '#db2777' }
+  };
   
-  showToast('📱 Membuat QR Code...');
-  
-  // Buat konten QR Code - bisa berupa teks atau URL
-  const kelas = document.getElementById('nama-kelas').value || 'Kelas';
-  const sekolah = document.getElementById('nama-sekolah').value || 'Sekolah';
-  const qrContent = `Jadwal ${kelas} - ${sekolah}\nTotal Jam: ${scheduleData.flatMap(d => d.kodes).length}\nGenerated: ${new Date().toLocaleDateString('id-ID')}`;
-  
-  // Hapus QR Code lama
-  const qrContainer = document.getElementById('qr-code');
-  qrContainer.innerHTML = '';
-  
-  // Buat canvas untuk QR Code
-  const canvas = document.createElement('canvas');
-  
-  // Generate QR Code menggunakan library QRCode
-  QRCode.toCanvas(canvas, qrContent, { 
-    width: 200,
-    margin: 2,
-    color: {
-      dark: '#000000',
-      light: '#ffffff'
+  if (themes[color]) {
+    root.style.setProperty('--accent', themes[color].accent);
+    root.style.setProperty('--accent2', themes[color].accent2);
+    showToast(`🎨 Tema ${color} diterapkan!`);
+    
+    if (currentUser) {
+      addActivityLog('Ganti Tema', `Mengubah tema ke ${color}`);
     }
-  }, function(error) {
-    if (error) {
-      console.error(error);
-      showToast('❌ Gagal membuat QR Code');
-      
-      // Fallback: tampilkan teks
-      qrContainer.innerHTML = `<div style="padding:20px; background:#f0f0f0; border-radius:8px;">
-        <p style="font-weight:600;">QR Code Generator</p>
-        <p style="font-size:0.8rem;">${qrContent.substring(0, 50)}...</p>
-      </div>`;
-    } else {
-      qrContainer.innerHTML = '';
-      qrContainer.appendChild(canvas);
-      document.getElementById('qr-status').textContent = '✅ QR Code siap! Scan untuk lihat info jadwal';
-      showToast('✅ QR Code berhasil dibuat!');
-    }
-  });
-  
-  // Simpan QR content untuk download
-  window.currentQRContent = qrContent;
-  window.currentQRCanvas = canvas;
-}
-
-function downloadQRCode() {
-  if (!window.currentQRCanvas) {
-    showToast('⚠️ Generate QR Code terlebih dahulu');
-    return;
   }
-  
-  const link = document.createElement('a');
-  link.download = `QR-Jadwal-${document.getElementById('nama-kelas').value || 'Kelas'}.png`;
-  link.href = window.currentQRCanvas.toDataURL('image/png');
-  link.click();
-  showToast('✅ QR Code diunduh!');
 }
 
-function shareQRCode() {
-  generateQRCode();
-  showToast('📱 QR Code siap, scan untuk lihat info');
-}
-
-// === FITUR PENGINGAT ===
+// ================== REMINDER ==================
 function setReminder() {
   if (scheduleData.length === 0) {
     showToast('⚠️ Generate jadwal terlebih dahulu');
@@ -1733,20 +2828,10 @@ function setReminder() {
   }
   
   const minutes = document.getElementById('reminder-minutes').value;
-  const now = new Date();
-  const day = now.getDay(); // 0 = Minggu, 1 = Senin, ...
+  showToast(`⏰ Pengingat diset ${minutes} menit sebelum jam pelajaran`);
   
-  if (day >= 1 && day <= 5) { // Senin - Jumat
-    showToast(`⏰ Pengingat diset ${minutes} menit sebelum jam pelajaran`);
-    
-    // Simulasi reminder (di real app ini perlu service worker)
-    setTimeout(() => {
-      if (confirm('⏰ Jadwal akan segera dimulai! Lihat jadwal sekarang?')) {
-        switchTab('editor', document.querySelector('.tab'));
-      }
-    }, 5000);
-  } else {
-    showToast('📅 Hari ini tidak ada jadwal sekolah');
+  if (currentUser) {
+    addActivityLog('Set Reminder', `Mengatur pengingat ${minutes} menit`);
   }
 }
 
@@ -1754,7 +2839,7 @@ function clearReminder() {
   showToast('🗑️ Semua pengingat dihapus');
 }
 
-// === FITUR SHARE DENGAN GAMBAR ===
+// ================== SHARE LINK ==================
 function generateUniqueId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 }
@@ -1814,6 +2899,10 @@ async function generateShareableLink() {
     
     showShareModal(shareUrl, imageDataUrl);
     
+    if (currentUser) {
+      addActivityLog('Share Jadwal', `Membuat link share untuk ${scheduleInfo.kelas}`);
+    }
+    
   } catch (error) {
     console.error('Gagal membuat share link:', error);
     showToast('❌ Gagal membuat link share');
@@ -1846,7 +2935,7 @@ function copyShareLink() {
   });
 }
 
-// === FUNGSI UNTUK PREVIEW PAGE ===
+// ================== PREVIEW PAGE ==================
 function loadPreviewFromId(id) {
   const imageDataUrl = getSharedImage(id);
   const scheduleData = getSharedData(id);
@@ -1897,7 +2986,7 @@ function goToEditor() {
   window.location.href = window.location.href.split('?')[0];
 }
 
-// === FITUR STATISTIK MODAL ===
+// ================== STATISTIK MODAL ==================
 function showScheduleStats() {
   if (scheduleData.length === 0) {
     showToast('⚠️ Generate jadwal terlebih dahulu');
@@ -1953,100 +3042,27 @@ function closeStatsModal() {
   document.getElementById('stats-modal').style.display = 'none';
 }
 
-// ===== FITUR ADMIN DASHBOARD (BARU) =====
-function openAdminDashboard() {
-  const modal = document.getElementById('admin-modal');
+// ================== TAB SWITCHING ==================
+function switchTab(tabName, element) {
+  document.getElementById('tab-editor').style.display = 'none';
+  document.getElementById('tab-analytics').style.display = 'none';
+  document.getElementById('tab-quiz').style.display = 'none';
+  document.getElementById('tab-themes').style.display = 'none';
   
-  // Hitung total jadwal tersimpan
-  const sharedData = JSON.parse(localStorage.getItem(SHARED_DATA_KEY) || '{}');
-  const totalSchedules = Object.keys(sharedData).length;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   
-  // Hitung jumlah guru unik dari kodeGuru
-  const guruSet = new Set();
-  Object.values(kodeGuru).forEach(g => { if(g.nama) guruSet.add(g.nama); });
-  const totalGuru = guruSet.size;
+  document.getElementById(`tab-${tabName}`).style.display = 'block';
   
-  // Hitung jumlah mapel unik
-  const mapelSet = new Set();
-  Object.values(kodeGuru).forEach(g => { if(g.mapel) mapelSet.add(g.mapel); });
-  const totalMapel = mapelSet.size;
+  if (element) element.classList.add('active');
   
-  // Hitung perkiraan ukuran localStorage (dalam KB)
-  let totalBytes = 0;
-  for (let key in localStorage) {
-    if (localStorage.hasOwnProperty(key)) {
-      totalBytes += (localStorage[key].length + key.length) * 2; // perkiraan
-    }
+  if (tabName === 'analytics' && scheduleData.length > 0) {
+    updateAnalytics();
+  } else if (tabName === 'quiz' && scheduleData.length > 0) {
+    prepareQuiz();
   }
-  const storageKB = (totalBytes / 1024).toFixed(2);
-  
-  document.getElementById('admin-total-schedules').textContent = totalSchedules;
-  document.getElementById('admin-total-guru').textContent = totalGuru;
-  document.getElementById('admin-total-mapel').textContent = totalMapel;
-  document.getElementById('admin-storage-size').textContent = storageKB + ' KB';
-  
-  // Tampilkan daftar jadwal tersimpan
-  const listContainer = document.getElementById('admin-shared-list');
-  if (totalSchedules === 0) {
-    listContainer.innerHTML = '<p class="text-muted">Belum ada jadwal tersimpan.</p>';
-  } else {
-    let html = '<ul style="list-style:none; padding:0;">';
-    Object.entries(sharedData).forEach(([id, data]) => {
-      const t = data.timestamp ? new Date(data.timestamp).toLocaleString('id-ID') : 'Tidak diketahui';
-      html += `<li style="padding:6px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between;">
-        <span><strong>${data.kelas || 'Kelas'}</strong> (${t})</span>
-        <button class="btn-icon" style="padding:2px 6px;" onclick="adminDeleteSchedule('${id}')" title="Hapus">🗑️</button>
-      </li>`;
-    });
-    html += '</ul>';
-    listContainer.innerHTML = html;
-  }
-  
-  modal.style.display = 'flex';
 }
 
-function closeAdminModal() {
-  document.getElementById('admin-modal').style.display = 'none';
-}
-
-function adminDeleteSchedule(id) {
-  if (!confirm('Hapus jadwal tersimpan ini?')) return;
-  const sharedImages = JSON.parse(localStorage.getItem(SHARED_IMAGES_KEY) || '{}');
-  const sharedData = JSON.parse(localStorage.getItem(SHARED_DATA_KEY) || '{}');
-  delete sharedImages[id];
-  delete sharedData[id];
-  localStorage.setItem(SHARED_IMAGES_KEY, JSON.stringify(sharedImages));
-  localStorage.setItem(SHARED_DATA_KEY, JSON.stringify(sharedData));
-  showToast('🗑️ Jadwal dihapus');
-  openAdminDashboard(); // refresh
-}
-
-function adminClearAllShares() {
-  if (!confirm('⚠️ Hapus SEMUA data jadwal tersimpan? Data tidak dapat dikembalikan!')) return;
-  localStorage.removeItem(SHARED_IMAGES_KEY);
-  localStorage.removeItem(SHARED_DATA_KEY);
-  showToast('✅ Semua data share dihapus');
-  openAdminDashboard();
-}
-
-function exportAdminLogs() {
-  // Ekspor stat sederhana ke file teks
-  const sharedData = JSON.parse(localStorage.getItem(SHARED_DATA_KEY) || '{}');
-  const log = {
-    timestamp: new Date().toISOString(),
-    totalSchedules: Object.keys(sharedData).length,
-    schedules: sharedData,
-    kodeGuruCount: Object.keys(kodeGuru).length
-  };
-  const blob = new Blob([JSON.stringify(log, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `admin-log-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  showToast('📄 Log diekspor');
-}
-
-// ── Toast ──
+// ================== TOAST ==================
 let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -2055,50 +3071,22 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ── Inisialisasi dan Cek Parameter URL ──
+// ================== INITIALIZATION ==================
 window.addEventListener('load', function() {
-  // Load contoh data otomatis
-  setTimeout(() => {
-    loadContoh();
-  }, 500);
-  
+  // Check for share ID in URL
   const urlParams = new URLSearchParams(window.location.search);
   const shareId = urlParams.get('share');
   
   if (shareId) {
     loadPreviewFromId(shareId);
   } else {
-    document.querySelector('header').style.display = 'flex';
-    document.querySelector('main').style.display = 'block';
-    document.querySelector('footer').style.display = 'block';
+    // Show login page by default
+    document.getElementById('login-page').style.display = 'flex';
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('admin-dashboard').style.display = 'none';
     
-    if (window.location.hash) {
-      try {
-        const hash = window.location.hash.substring(1);
-        const json = LZString.decompressFromEncodedURIComponent(hash);
-        if (json) {
-          const data = JSON.parse(json);
-          document.getElementById('nama-sekolah').value = data.s || '';
-          document.getElementById('nama-kelas').value = data.k || '';
-          document.getElementById('semester').value = data.sem || '';
-          document.getElementById('tgl-mulai').value = data.t || '';
-          document.getElementById('jam-per-hari').value = data.jph || 10;
-          buildJamConfig();
-          if (data.jt && Array.isArray(data.jt)) {
-            for (let i = 0; i < data.jt.length; i++) {
-              const el = document.getElementById(`jt-${i+1}`);
-              if (el) el.value = data.jt[i];
-            }
-          }
-          document.getElementById('kodes').value = data.kd || '';
-          document.getElementById('kodes').dispatchEvent(new Event('input'));
-          generateJadwal();
-          showToast('✅ Data dari link dimuat');
-        }
-      } catch (e) {
-        console.error('Gagal memuat data dari hash', e);
-      }
-    }
+    // Add initial activity logs
+    addActivityLog('System', 'Aplikasi dimulai');
   }
 });
 </script>
@@ -2106,10 +3094,8 @@ window.addEventListener('load', function() {
 <footer style="text-align:center; margin: 20px 0; font-size:0.75rem; color:var(--text2);">
  dibuat oleh <a href="https://www.instagram.com/a.farhanhan/" target="_blank">Ammar Farhan</a> | 
  <a href="https://github.com/farhanboutak/jadwal" target="_blank">GitHub</a> | 
- <a href="https://github.com/farhanboutak/jadwal" target="_blank">Version: 3.1.0</a> |
- <a href="#" onclick="window.location.href=window.location.href.split('?')[0];return false;">Editor</a> |
- <!-- Tombol Admin Dashboard di samping version -->
- <a href="#" onclick="openAdminDashboard();return false;" style="color: var(--accent); font-weight:600;">👑 Admin</a>
+ <a href="#" onclick="showMainApp()">Aplikasi Utama</a> |
+ <a href="#" onclick="showAdminLogin()">Admin Login</a>
 </footer>
 </body>
 </html>
