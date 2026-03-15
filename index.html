@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generator Jadwal Pelajaran – Pro</title>
+<title>Generator Jadwal Pelajaran – Shareable Schedule</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <style>
 :root {
@@ -55,11 +54,10 @@ header {
 .btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
 .btn-ghost:hover { background: var(--border); color: var(--text); }
 .btn-success { background: #059669; color: white; }
-.btn-success:hover { opacity: 0.88; }
 .btn-warning { background: #d97706; color: white; }
-.btn-warning:hover { opacity: 0.88; }
 .btn-danger { background: #dc2626; color: white; }
-.btn-danger:hover { opacity: 0.88; }
+.btn-share { background: #8b5cf6; color: white; }
+.btn-share:hover { background: #7c3aed; }
 
 /* Main */
 main { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
@@ -115,7 +113,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 .output-title p { font-size: 0.75rem; color: var(--text2); margin-top: 3px; }
 .export-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 
-/* Filter bar with extra controls */
+/* Filter bar */
 .filter-bar {
   display: flex;
   gap: 12px;
@@ -138,12 +136,12 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 .clear-search { background: transparent; border: none; font-size: 1rem; cursor: pointer; padding: 4px 8px; color: var(--text2); }
 .clear-search:hover { color: var(--accent); }
 
-/* Checkbox time row */
+/* Time toggle */
 .time-toggle-wrap { display: flex; align-items: center; gap: 6px; }
 .time-toggle-wrap input { width: 16px; height: 16px; cursor: pointer; }
 .time-toggle-wrap label { font-size: 0.8rem; font-weight: 500; cursor: pointer; }
 
-/* ═══ THE SCHEDULE GRID TABLE (diperbesar) ═══ */
+/* ═══ THE SCHEDULE GRID TABLE ═══ */
 #jadwal-print-area {
   background: white;
   padding: 24px 28px 20px;
@@ -176,7 +174,6 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 }
 [data-theme="dark"] .sched-grid th, [data-theme="dark"] .sched-grid td { border-color: #475569; }
 
-/* Header row (jam numbers) */
 .sched-grid thead th {
   background: #eaeef5;
   font-weight: 700;
@@ -187,7 +184,6 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 }
 [data-theme="dark"] .sched-grid thead th { background: #0f172a; color: #e2e8f0; border-color: #475569; }
 
-/* Day column */
 .col-hari {
   width: 90px; min-width: 90px;
   font-weight: 800;
@@ -199,7 +195,6 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 }
 [data-theme="dark"] .col-hari { background: #1e293b; color: #e2e8f0; border-right-color: #64748b !important; }
 
-/* Subject cell */
 .cell-mapel {
   padding: 12px 10px;
   line-height: 1.4;
@@ -210,7 +205,6 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 [data-theme="dark"] .cell-mapel .mapel { color: #e2e8f0; }
 [data-theme="dark"] .cell-mapel .guru { color: #9aa9c1; }
 
-/* Special cells */
 .cell-empty { background: #fafafa; }
 .cell-gls { background: #fff9c6; }
 .cell-upcr { background: #d9f0d9; }
@@ -221,7 +215,6 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 [data-theme="dark"] .cell-bk { background: #3a1a2a; }
 [data-theme="dark"] .cell-krida { background: #1a2a3a; }
 
-/* Time row */
 .time-row td {
   font-size: 0.8rem; color: #666; background: #f9f9f9;
   padding: 6px 4px; border-top: none;
@@ -229,14 +222,13 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 }
 [data-theme="dark"] .time-row td { background: #1e293b; color: #94a3b8; }
 
-/* Footer */
 .jadwal-footer {
   display: flex; justify-content: space-between; align-items: center;
   margin-top: 16px; font-size: 0.75rem; color: #888;
   padding: 0 4px;
 }
 
-/* Dynamic font size classes */
+/* Font size classes */
 .sched-grid.font-small { font-size: 0.8rem; }
 .sched-grid.font-small .col-hari { font-size: 0.9rem; }
 .sched-grid.font-small .cell-mapel .mapel { font-size: 0.85rem; }
@@ -263,21 +255,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 }
 #toast.show { transform: translateY(0); opacity: 1; }
 
-/* Print */
-@media print {
-  body * { visibility: hidden; }
-  #jadwal-print-area, #jadwal-print-area * { visibility: visible; }
-  #jadwal-print-area { position: fixed; left: 0; top: 0; width: 100%; padding: 12px; }
-  .sched-grid { font-size: 0.9rem; min-width: unset; }
-}
-
-/* Responsive */
-@media (max-width: 800px) {
-  .filter-bar { flex-direction: column; align-items: stretch; }
-  .range-wrap, .time-toggle-wrap { justify-content: flex-start; }
-}
-
-/* Modal styling */
+/* Modal */
 .modal {
   display: none;
   position: fixed;
@@ -296,7 +274,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 .modal-content {
   background: var(--surface);
   border-radius: var(--radius);
-  max-width: 400px;
+  max-width: 500px;
   width: 90%;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
@@ -305,27 +283,12 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 }
 
 .modal-body {
-  padding: 32px 24px;
-  text-align: center;
+  padding: 24px;
 }
 
-.modal-icon {
-  font-size: 3rem;
-  display: block;
+.modal-body h3 {
   margin-bottom: 16px;
-}
-
-.modal h2 {
-  font-size: 1.6rem;
-  font-weight: 700;
   color: var(--accent);
-  margin-bottom: 12px;
-}
-
-.modal p {
-  color: var(--text2);
-  margin-bottom: 24px;
-  line-height: 1.5;
 }
 
 .close-btn {
@@ -353,38 +316,48 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* Item histori */
-.histori-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
+/* Share preview */
+.share-preview {
+  margin-top: 20px;
+  text-align: center;
 }
-.histori-item:last-child { border-bottom: none; }
-.histori-info {
-  flex: 1;
-  cursor: pointer;
+
+.share-preview img {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow);
 }
-.histori-info:hover {
-  background: var(--surface2);
-}
-.histori-judul {
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-.histori-tanggal {
-  font-size: 0.7rem;
-  color: var(--text2);
-}
-.histori-actions {
+
+.share-link-container {
   display: flex;
   gap: 8px;
+  margin-top: 16px;
 }
-.histori-actions button {
-  padding: 4px 8px;
-  font-size: 0.7rem;
+
+.share-link-container input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+/* Print */
+@media print {
+  body * { visibility: hidden; }
+  #jadwal-print-area, #jadwal-print-area * { visibility: visible; }
+  #jadwal-print-area { position: fixed; left: 0; top: 0; width: 100%; padding: 12px; }
+  .sched-grid { font-size: 0.9rem; min-width: unset; }
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .range-wrap, .time-toggle-wrap { justify-content: flex-start; }
 }
 </style>
 </head>
@@ -395,7 +368,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
     <div class="logo-icon">📅</div>
     <div>
       <h1>Jadwal Pelajaran</h1>
-      <span>Made with love❤️</span>
+      <span>Shareable Schedule</span>
     </div>
   </div>
   <div class="header-actions">
@@ -409,7 +382,7 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   <div class="card" id="step1-card">
     <div class="card-header">
       <span class="card-header-icon">🏫</span>
-      <div><h2>Informasi Jadwal</h2><p>Isi identitas sekolah dan kelas (kosongkan jika tidak ingin ditampilkan)</p></div>
+      <div><h2>Informasi Jadwal</h2><p>Isi identitas sekolah dan kelas</p></div>
     </div>
     <div class="card-body">
       <div class="form-row form-row-2">
@@ -419,43 +392,41 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
         </div>
         <div class="form-group">
           <label class="form-label">Nama Kelas</label>
-          <input type="text" id="nama-kelas" placeholder="Contoh: XI TJKT 3, XI TKL">
+          <input type="text" id="nama-kelas" placeholder="Contoh: XI TJKT 3">
         </div>
       </div>
       <div class="form-row form-row-2">
         <div class="form-group">
           <label class="form-label">Semester</label>
-          <input type="text" id="semester" placeholder="Contoh: Semester 1 " value="Semester 2">
+          <input type="text" id="semester" placeholder="Semester 1" value="Semester 2">
         </div>
         <div class="form-group">
           <label class="form-label">Tanggal Mulai</label>
-          <input type="text" id="tgl-mulai" placeholder="Kosongkan kalau tidak ingin ditampilkan">
+          <input type="text" id="tgl-mulai" placeholder="Mulai 18 Juli 2022">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Jumlah Jam per Hari <span class="badge">Senin–Kamis</span></label>
           <input type="number" id="jam-per-hari" value="10" min="6" max="12" style="max-width:120px;">
-          <p class="form-hint">Jumat otomatis menggunakan sisa kode setelah Senin–Kamis.</p>
+          <p class="form-hint">Jumat otomatis menggunakan sisa kode</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Step 2: Jam & Waktu (opsional) -->
+  <!-- Step 2: Jam & Waktu -->
   <div class="card" id="step2-card">
     <div class="card-header">
       <span class="card-header-icon">⏰</span>
-      <div><h2>Waktu Jam Pelajaran</h2><p>Opsional — isi waktu tiap jam untuk ditampilkan di jadwal</p></div>
+      <div><h2>Waktu Jam Pelajaran</h2><p>Opsional — isi waktu tiap jam</p></div>
     </div>
     <div class="card-body">
-      <!-- Checkbox untuk mengosongkan semua jam (default dicentang) -->
       <div class="clear-jam-wrapper">
         <input type="checkbox" id="clear-jam-checkbox" checked>
         <label for="clear-jam-checkbox">Kosongkan semua jam (sembunyikan waktu)</label>
       </div>
       <div class="jam-config" id="jam-config-wrap"></div>
-      <p class="form-hint" style="margin-top:12px;">💡 Kosongkan jika tidak ingin menampilkan waktu (seperti foto).</p>
     </div>
   </div>
 
@@ -463,12 +434,12 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
   <div class="card" id="step3-card">
     <div class="card-header">
       <span class="card-header-icon">📝</span>
-      <div><h2>Input Kode Guru</h2><p>Masukkan kode guru sesuai urutan jam pelajaran</p></div>
+      <div><h2>Input Kode Guru</h2><p>Masukkan kode guru sesuai urutan jam</p></div>
     </div>
     <div class="card-body">
       <div class="form-group" style="margin-bottom:16px;">
         <label class="form-label">Kode Guru <span class="badge">Minimal 41 kode</span></label>
-        <textarea id="kodes" placeholder="Pisah spasi/koma. Contoh:&#10;Upcr D4 D4 T3 T3 Mat G1 J1 J1 H1&#10;GLS GLS BI BI BK Seni Seni IF IF IF&#10;..."></textarea>
+        <textarea id="kodes" placeholder="Pisah spasi/koma. Contoh:&#10;Upcr DTK DTK END END YTS YTS G1 G1 G1&#10;GLS GLS NRM DRS DRS SGS SGS SGS IF1 IF1&#10;..."></textarea>
         <p class="form-hint">Senin–Kamis: <strong id="hint-jam">10</strong> kode/hari · Jumat: sisanya</p>
       </div>
       <div class="counter-row" id="counter-row" style="display:none">
@@ -494,39 +465,29 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
       </div>
       <div class="export-btns">
         <button class="btn btn-ghost" onclick="showInputSection()">✏️ Edit</button>
-        <button class="btn btn-ghost" onclick="simpanJadwal()">💾 Simpan</button>
-        <button class="btn btn-ghost" onclick="muatJadwal()">📂 Muat</button>
-        <!-- Tombol Histori -->
-        <button class="btn btn-ghost" onclick="tampilkanHistori()">📜 Histori</button>
-        <!-- Tombol Link Pendek (sudah diperbaiki) -->
-        <button class="btn btn-ghost" onclick="getShortLink()">🔗 Link Pendek</button>
+        <button class="btn btn-share" onclick="generateShareableLink()">🔗 Buat Link Share</button>
         <button class="btn btn-success" onclick="downloadCSV()">📊 CSV</button>
         <button class="btn btn-warning" onclick="downloadJPG()">🖼️ JPG</button>
-        <button class="btn btn-danger" onclick="downloadPDF()">📄 PDF</button>
       </div>
     </div>
 
-    <!-- Filter bar dengan fitur baru -->
+    <!-- Filter bar -->
     <div class="filter-bar">
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
         <input type="text" id="search-input" placeholder="Cari mapel, guru, kode..." oninput="renderGrid()">
-        <button class="clear-search" onclick="document.getElementById('search-input').value=''; renderGrid();" title="Hapus pencarian">✖</button>
+        <button class="clear-search" onclick="document.getElementById('search-input').value=''; renderGrid();">✖</button>
       </div>
       <select class="filter-select" id="filter-hari" onchange="renderGrid()">
         <option value="">Semua Hari</option>
         <option>Senin</option><option>Selasa</option><option>Rabu</option>
         <option>Kamis</option><option>Jumat</option>
       </select>
-
-      <!-- Pengatur ukuran font -->
       <div class="range-wrap">
         <label for="font-size-slider">🔤 Ukuran:</label>
         <input type="range" id="font-size-slider" min="0.8" max="1.5" step="0.1" value="1.0">
         <span id="font-size-value">1.0rem</span>
       </div>
-
-      <!-- Toggle baris waktu -->
       <div class="time-toggle-wrap">
         <input type="checkbox" id="show-time-row" onchange="renderGrid()">
         <label for="show-time-row">⏲️ Tampilkan jam</label>
@@ -552,38 +513,51 @@ textarea::placeholder, input::placeholder { color: var(--text2); opacity: 0.6; }
 
 <div id="toast"></div>
 
-<!-- Modal Histori -->
-<div id="histori-modal" class="modal">
-  <div class="modal-content" style="max-width:500px;">
-    <span class="close-btn" onclick="closeHistoriModal()">&times;</span>
+<!-- Modal Share -->
+<div id="share-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeShareModal()">&times;</span>
     <div class="modal-body">
-      <h3 style="margin-bottom:16px;">📜 Histori Jadwal</h3>
-      <div id="histori-list" style="max-height:300px; overflow-y:auto; margin-bottom:16px;"></div>
-      <div style="display:flex; gap:8px; justify-content:flex-end;">
-        <button class="btn btn-ghost" onclick="clearHistori()">Hapus Semua</button>
-        <button class="btn btn-primary" onclick="closeHistoriModal()">Tutup</button>
+      <h3>🔗 Link Share Jadwal</h3>
+      <p style="margin-bottom:16px; color:var(--text2);">Bagikan link ini untuk menampilkan jadwal sebagai gambar:</p>
+      
+      <div class="share-preview" id="share-preview-container">
+        <!-- Preview gambar akan dimuat di sini -->
+      </div>
+      
+      <div class="share-link-container">
+        <input type="text" id="share-link" readonly>
+        <button class="btn btn-primary" onclick="copyShareLink()">Salin</button>
+      </div>
+      
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:16px;">
+        <button class="btn btn-ghost" onclick="closeShareModal()">Tutup</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal Ramadhan -->
-<div id="ramadhan-modal" class="modal">
-  <div class="modal-content">
-    <span class="close-btn" onclick="closeModal()">&times;</span>
-    <div class="modal-body">
-      <span class="modal-icon">🌙</span>
-      <h2>Marhaban ya Ramadhan</h2>
-      <p>Selamat menunaikan ibadah puasa. Semoga bulan suci ini membawa berkah.</p>
-      <button class="btn btn-primary" onclick="closeModal()">Tutup</button>
+<!-- Halaman Preview (tersembunyi, akan ditampilkan jika ada parameter preview) -->
+<div id="preview-page" style="display:none;">
+  <div style="max-width:1200px; margin:0 auto; padding:20px;">
+    <div style="text-align:center; margin-bottom:20px;">
+      <h1 style="color:var(--accent);">Preview Jadwal Pelajaran</h1>
+      <p style="color:var(--text2);">Jadwal ini dibuat menggunakan Generator Jadwal Pro</p>
+    </div>
+    <div id="preview-container" style="background:white; border-radius:var(--radius); padding:20px; box-shadow:var(--shadow);">
+      <!-- Jadwal akan dirender di sini untuk preview -->
+    </div>
+    <div style="text-align:center; margin-top:20px;">
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak</button>
+      <button class="btn btn-ghost" onclick="downloadPreviewJPG()">🖼️ Download JPG</button>
+      <button class="btn btn-outline" onclick="goToEditor()">✏️ Edit di Editor</button>
     </div>
   </div>
 </div>
 
 <script>
-// ==================  KODE GURU ==================
+// ================== KODE GURU ==================
 const kodeGuru = {
-  // Kode asli (tetap dipertahankan)
   "A1": { nama: "Dra. Siti Rahayu", mapel: "PA. Islam" },
   "A2": { nama: "Dwi Sidik Purnomo", mapel: "PA. Islam" },
   "A3": { nama: "Akhmad Affandi", mapel: "PA. Islam" },
@@ -640,7 +614,6 @@ const kodeGuru = {
   "IF1": { nama: "Ninik Sulistyowati", mapel: "Informatika" },
   "W1": { nama: "Heryani Retno H.", mapel: "Bahasa Jawa" },
   "W2": { nama: "Aji Saputra", mapel: "Bahasa Jawa" },
-  // Special non-guru codes
   "GLS": { nama: "", mapel: "GLS" },
   "UPCR": { nama: "", mapel: "Upacara" },
   "Upcr": { nama: "", mapel: "Upacara" },
@@ -649,8 +622,6 @@ const kodeGuru = {
   "BK": { nama: "", mapel: "BK" },
   "KJR": { nama: "", mapel: "Mata Pelajaran Kejuruan" },
   "-": { nama: "", mapel: "" },
-
-  // KODE TEST (untuk contoh data)
   "DTK": { nama: "TEST", mapel: "Bahasa Indonesia" },
   "END": { nama: "Bayu", mapel: "Matematika" },
   "YTS": { nama: "Baba", mapel: "IPS" },
@@ -667,10 +638,12 @@ const kodeGuru = {
 
 const HARI = ['Senin','Selasa','Rabu','Kamis','Jumat'];
 let scheduleData = [];
-let defaultJamTimes = []; // Menyimpan nilai default jam
+let defaultJamTimes = [];
+let _showTimeRow = false;
 
-// Variabel global untuk kontrol tampilan
-let _showTimeRow = false; // default tidak tampil
+// Database gambar yang dishare (simulasi server-side)
+const SHARED_IMAGES_KEY = 'sharedScheduleImages';
+const SHARED_DATA_KEY = 'sharedScheduleData';
 
 // ── Dark mode ──
 document.getElementById('theme-toggle').onclick = () => {
@@ -700,35 +673,23 @@ function buildJamConfig() {
       <input type="text" class="jam-time" id="jt-${i+1}" placeholder="${defaultVal}" value="${defaultVal}">
     </div>`;
   }
-  // Set checkbox state: jika checkbox dicentang, kosongkan semua
   const chk = document.getElementById('clear-jam-checkbox');
-  if (chk && chk.checked) {
-    clearAllJamFields(true);
-  }
+  if (chk && chk.checked) clearAllJamFields(true);
 }
 buildJamConfig();
 
-// Fungsi untuk mengosongkan/mengisi jam berdasarkan checkbox
 function clearAllJamFields(forceClear) {
   const n = parseInt(document.getElementById('jam-per-hari').value) || 10;
   for (let i = 1; i <= n; i++) {
     const el = document.getElementById(`jt-${i}`);
-    if (el) {
-      if (forceClear) {
-        el.value = '';
-      } else {
-        el.value = defaultJamTimes[i-1] || '';
-      }
-    }
+    if (el) el.value = forceClear ? '' : (defaultJamTimes[i-1] || '');
   }
 }
 
-// Event listener untuk checkbox
 document.getElementById('clear-jam-checkbox').addEventListener('change', function(e) {
   clearAllJamFields(e.target.checked);
 });
 
-// Saat jumlah jam berubah, rebuild dan sesuaikan checkbox, serta sembunyikan output jika ada
 document.getElementById('jam-per-hari').addEventListener('input', function() {
   buildJamConfig();
   if (scheduleData.length > 0) {
@@ -754,7 +715,7 @@ document.getElementById('kodes').addEventListener('input', function() {
   else { s.textContent = `⚠️ Kurang ${(need+1)-n}`; s.className = 'counter-chip warn'; }
 });
 
-// ── Generate ──
+// ── Generate Jadwal ──
 function generateJadwal() {
   const input = document.getElementById('kodes').value.trim();
   const kodes = input.split(/[\s,]+/).filter(Boolean);
@@ -766,7 +727,6 @@ function generateJadwal() {
     return;
   }
 
-  // Collect jam times
   const jamTimes = [];
   for (let i = 1; i <= jamPerHari; i++) {
     const el = document.getElementById(`jt-${i}`);
@@ -790,9 +750,6 @@ function generateJadwal() {
   document.getElementById('output-section').style.display = 'block';
   document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
   showToast('✅ Jadwal berhasil dibuat!');
-
-  // Simpan ke histori setelah berhasil generate
-  simpanKeHistori();
 }
 
 function updatePrintHeader() {
@@ -818,29 +775,21 @@ function renderGrid() {
   const hariFilter = document.getElementById('filter-hari')?.value||'';
   const displayHari = hariFilter ? scheduleData.filter(d=>d.hari===hariFilter) : scheduleData;
 
-  // Ambil status toggle baris waktu
   _showTimeRow = document.getElementById('show-time-row').checked;
 
-  // Ambil nilai slider ukuran font
   const fontSize = parseFloat(document.getElementById('font-size-slider').value);
   document.getElementById('font-size-value').textContent = fontSize.toFixed(1) + 'rem';
   const table = document.getElementById('sched-grid-table');
-  // Hapus semua kelas font
   table.classList.remove('font-small', 'font-medium', 'font-large');
   if (fontSize <= 0.9) table.classList.add('font-small');
   else if (fontSize >= 1.2) table.classList.add('font-large');
-  else table.classList.add('font-medium'); // 1.0 default
+  else table.classList.add('font-medium');
 
-  // Build table
-  let html = '<thead><tr>';
-  html += `<th style="width:90px">Hari</th>`;
+  let html = '<thead><tr><th style="width:90px">Hari</th>';
   for (let i = 1; i <= jamPerHari; i++) html += `<th>${i}</th>`;
-  html += '</tr></thead>';
-
-  html += '<tbody>';
+  html += '</tr></thead><tbody>';
 
   displayHari.forEach(dayData => {
-    // Parse into merged cells
     const cells = [];
     let j = 0;
     const dk = dayData.kodes;
@@ -853,19 +802,15 @@ function renderGrid() {
       j += span;
     }
 
-    // Apply search highlight / filter
     const rowVisible = !q || cells.some(c =>
       c.mapel.toLowerCase().includes(q) || c.nama.toLowerCase().includes(q) || c.kode.toLowerCase().includes(q)
     );
     if (!rowVisible) return;
 
-    html += `<tr>`;
-    html += `<td class="col-hari">${dayData.hari}</td>`;
+    html += `<tr><td class="col-hari">${dayData.hari}</td>`;
 
-    // Fill up to jamPerHari columns
     let col = 1;
     cells.forEach(cell => {
-      // Gap before this cell
       while (col < cell.jamStart) {
         html += `<td class="cell-mapel cell-empty"></td>`;
         col++;
@@ -879,14 +824,12 @@ function renderGrid() {
       </td>`;
       col += cell.span;
     });
-    // Remaining empty cells
     while (col <= jamPerHari) {
       html += `<td class="cell-mapel cell-empty"></td>`;
       col++;
     }
     html += `</tr>`;
 
-    // Time sub-row if toggle on
     if (_showTimeRow) {
       html += `<tr class="time-row"><td></td>`;
       for (let i=0;i<jamPerHari;i++) html += `<td>${jamTimes[i]||''}</td>`;
@@ -907,32 +850,25 @@ function getSpecialClass(kode) {
   return '';
 }
 
-// Event listener untuk slider font
-document.getElementById('font-size-slider').addEventListener('input', function() {
-  renderGrid();
-});
+document.getElementById('font-size-slider').addEventListener('input', renderGrid);
 
-// === FUNGSI CAPTURE DENGAN CLONE (SOLUSI FULL LEBAR) ===
+// ── Fungsi Capture ──
 function captureElementFull(element) {
   return new Promise((resolve, reject) => {
-    // Clone elemen
     const clone = element.cloneNode(true);
-    // Buat container sementara di luar layar
     const container = document.createElement('div');
     container.style.position = 'absolute';
     container.style.left = '-9999px';
     container.style.top = '0';
-    container.style.width = 'max-content';  // selebar konten
+    container.style.width = 'max-content';
     container.style.height = 'auto';
     container.style.zIndex = '-1000';
     container.appendChild(clone);
     document.body.appendChild(container);
-
-    // Paksa tema terang untuk hasil yang konsisten
     container.setAttribute('data-theme', 'light');
 
     html2canvas(clone, {
-      scale: 3, // skala tinggi agar teks tajam
+      scale: 2,
       backgroundColor: '#ffffff',
       logging: false,
       allowTaint: false,
@@ -947,13 +883,13 @@ function captureElementFull(element) {
   });
 }
 
-// ── Download JPG dengan rasio 4:3 ──
+// ── Download JPG ──
 function downloadJPG() {
   if (scheduleData.length === 0) {
     showToast('❌ Buat jadwal terlebih dahulu');
     return;
   }
-  showToast('🖼️ Menyiapkan gambar... (proses)');
+  showToast('🖼️ Menyiapkan gambar...');
   const element = document.getElementById('jadwal-print-area');
   
   captureElementFull(element).then(canvas => {
@@ -981,7 +917,6 @@ function downloadJPG() {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, targetW, targetH);
 
-    // Hitung posisi agar gambar di tengah
     const dx = Math.round((targetW - origW) / 2);
     const dy = Math.round((targetH - origH) / 2);
     ctx.drawImage(canvas, dx, dy);
@@ -998,48 +933,6 @@ function downloadJPG() {
   }).catch(err => {
     console.error(err);
     showToast('❌ Gagal membuat gambar');
-  });
-}
-
-// ── Download PDF dengan rasio 4:3 ──
-function downloadPDF() {
-  if (scheduleData.length === 0) {
-    showToast('❌ Buat jadwal terlebih dahulu');
-    return;
-  }
-  showToast('📄 Menyiapkan PDF... (proses)');
-  const element = document.getElementById('jadwal-print-area');
-  
-  captureElementFull(element).then(canvas => {
-    const { jsPDF } = window.jspdf;
-    const pdfW = 240; // mm
-    const pdfH = 180; // mm
-    const pdf = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: [pdfW, pdfH]
-    });
-
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const margin = 5; // mm
-    const maxW = pdfW - margin * 2;
-    const maxH = pdfH - margin * 2;
-
-    const origW = canvas.width;
-    const origH = canvas.height;
-
-    const scale = Math.min(maxW / origW, maxH / origH);
-    const w = origW * scale;
-    const h = origH * scale;
-    const x = (pdfW - w) / 2;
-    const y = (pdfH - h) / 2;
-
-    pdf.addImage(imgData, 'JPEG', x, y, w, h);
-    pdf.save(`Jadwal-${document.getElementById('nama-kelas').value || 'Kelas'}.pdf`);
-    showToast('✅ PDF berhasil diunduh!');
-  }).catch(err => {
-    console.error(err);
-    showToast('❌ Gagal membuat PDF');
   });
 }
 
@@ -1081,7 +974,6 @@ function clearForm() {
 }
 
 function loadContoh() {
-  // Mengisi data sesuai dengan foto yang dikirim
   document.getElementById('nama-kelas').value = 'VII E';
   document.getElementById('nama-sekolah').value = 'SMP Negeri 1 Semarang';
   document.getElementById('semester').value = 'Semester 1 Tahun Pelajaran 2022/2023';
@@ -1089,217 +981,187 @@ function loadContoh() {
   document.getElementById('jam-per-hari').value = 10;
   buildJamConfig();
   
-  // Pastikan checkbox dicentang (jam kosong)
   document.getElementById('clear-jam-checkbox').checked = true;
   clearAllJamFields(true);
 
-  // Kode-kode yang disusun menyerupai foto
   const contohKode = 
-    'Upcr DTK DTK END END YTS YTS G1 G1 G1 ' +                 // Senin (10)
-    'GLS GLS NRM DRS DRS SGS SGS SGS IF1 IF1 ' +               // Selasa (10)
-    'GLS GLS SRW SRW SRW IDS IDS IDS A1 A1 ' +                 // Rabu (10)
-    'DTK DTK DTK END END YTS YTS ID2 ID2 SSC ' +               // Kamis (10)
-    'KBN KBN KBN W1 W1 W1 R1 R1';                              // Jumat (9)
+    'Upcr DTK DTK END END YTS YTS G1 G1 G1 ' +
+    'GLS GLS NRM DRS DRS SGS SGS SGS IF1 IF1 ' +
+    'GLS GLS SRW SRW SRW IDS IDS IDS A1 A1 ' +
+    'DTK DTK DTK END END YTS YTS ID2 ID2 SSC ' +
+    'KBN KBN KBN W1 W1 W1 R1 R1';
 
   document.getElementById('kodes').value = contohKode;
   document.getElementById('kodes').dispatchEvent(new Event('input'));
-  showToast('📋 Contoh data mirip foto dimuat!');
+  showToast('📋 Contoh data dimuat!');
 }
 
-// ── Fitur Simpan ke localStorage (satu data) ──
-function simpanJadwal() {
-  const data = {
-    sekolah: document.getElementById('nama-sekolah').value,
-    kelas: document.getElementById('nama-kelas').value,
-    semester: document.getElementById('semester').value,
-    tgl: document.getElementById('tgl-mulai').value,
-    jamPerHari: document.getElementById('jam-per-hari').value,
-    jamTimes: [],
-    kodes: document.getElementById('kodes').value
-  };
-  for (let i = 1; i <= data.jamPerHari; i++) {
-    const el = document.getElementById(`jt-${i}`);
-    if (el) data.jamTimes.push(el.value);
+// === FITUR SHARE DENGAN GAMBAR ===
+
+// Fungsi untuk membuat ID unik
+function generateUniqueId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+}
+
+// Fungsi untuk menyimpan gambar ke localStorage (simulasi server)
+function saveSharedImage(imageDataUrl, scheduleData) {
+  const sharedImages = JSON.parse(localStorage.getItem(SHARED_IMAGES_KEY) || '{}');
+  const sharedData = JSON.parse(localStorage.getItem(SHARED_DATA_KEY) || '{}');
+  
+  const id = generateUniqueId();
+  
+  // Simpan gambar (DataURL)
+  sharedImages[id] = imageDataUrl;
+  
+  // Simpan data jadwal untuk preview
+  sharedData[id] = scheduleData;
+  
+  localStorage.setItem(SHARED_IMAGES_KEY, JSON.stringify(sharedImages));
+  localStorage.setItem(SHARED_DATA_KEY, JSON.stringify(sharedData));
+  
+  return id;
+}
+
+// Fungsi untuk mendapatkan gambar berdasarkan ID
+function getSharedImage(id) {
+  const sharedImages = JSON.parse(localStorage.getItem(SHARED_IMAGES_KEY) || '{}');
+  return sharedImages[id];
+}
+
+// Fungsi untuk mendapatkan data jadwal berdasarkan ID
+function getSharedData(id) {
+  const sharedData = JSON.parse(localStorage.getItem(SHARED_DATA_KEY) || '{}');
+  return sharedData[id];
+}
+
+// Fungsi utama untuk membuat link share
+async function generateShareableLink() {
+  if (scheduleData.length === 0) {
+    showToast('❌ Buat jadwal terlebih dahulu');
+    return;
   }
-  localStorage.setItem('jadwalData', JSON.stringify(data));
-  showToast('✅ Jadwal tersimpan!');
-}
-
-function muatJadwal() {
-  const saved = localStorage.getItem('jadwalData');
-  if (!saved) { showToast('❌ Tidak ada data tersimpan'); return; }
+  
+  showToast('📸 Menyiapkan gambar untuk dishare...');
+  
   try {
-    const data = JSON.parse(saved);
-    document.getElementById('nama-sekolah').value = data.sekolah || '';
-    document.getElementById('nama-kelas').value = data.kelas || '';
-    document.getElementById('semester').value = data.semester || '';
-    document.getElementById('tgl-mulai').value = data.tgl || '';
-    document.getElementById('jam-per-hari').value = data.jamPerHari || 10;
-    buildJamConfig();
-    if (data.jamTimes && Array.isArray(data.jamTimes)) {
-      for (let i = 0; i < data.jamTimes.length; i++) {
-        const el = document.getElementById(`jt-${i+1}`);
-        if (el) el.value = data.jamTimes[i];
-      }
-    }
-    document.getElementById('kodes').value = data.kodes || '';
-    document.getElementById('kodes').dispatchEvent(new Event('input'));
-    generateJadwal();
-    showToast('✅ Jadwal dimuat!');
-  } catch (e) {
-    showToast('❌ Gagal memuat data');
+    const element = document.getElementById('jadwal-print-area');
+    const canvas = await captureElementFull(element);
+    
+    // Konversi ke DataURL
+    const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    
+    // Kumpulkan data jadwal
+    const scheduleInfo = {
+      sekolah: document.getElementById('nama-sekolah').value,
+      kelas: document.getElementById('nama-kelas').value,
+      semester: document.getElementById('semester').value,
+      tgl: document.getElementById('tgl-mulai').value,
+      jamPerHari: window._jamPerHari,
+      jamTimes: window._jamTimes,
+      kodes: document.getElementById('kodes').value,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Simpan gambar dan data
+    const id = saveSharedImage(imageDataUrl, scheduleInfo);
+    
+    // Buat URL share
+    const shareUrl = window.location.href.split('#')[0].split('?')[0] + '?share=' + id;
+    
+    // Tampilkan modal dengan preview
+    showShareModal(shareUrl, imageDataUrl);
+    
+  } catch (error) {
+    console.error('Gagal membuat share link:', error);
+    showToast('❌ Gagal membuat link share');
   }
 }
 
-// === FITUR HISTORI ===
-const HISTORI_KEY = 'jadwalHistori';
-const MAX_HISTORI = 10;
-
-// Ambil histori dari localStorage
-function getHistori() {
-  const stored = localStorage.getItem(HISTORI_KEY);
-  return stored ? JSON.parse(stored) : [];
-}
-
-// Simpan histori (array) ke localStorage
-function setHistori(arr) {
-  localStorage.setItem(HISTORI_KEY, JSON.stringify(arr));
-}
-
-// Tambahkan jadwal saat ini ke histori
-function simpanKeHistori() {
-  const data = {
-    sekolah: document.getElementById('nama-sekolah').value,
-    kelas: document.getElementById('nama-kelas').value,
-    semester: document.getElementById('semester').value,
-    tgl: document.getElementById('tgl-mulai').value,
-    jamPerHari: document.getElementById('jam-per-hari').value,
-    jamTimes: [],
-    kodes: document.getElementById('kodes').value
-  };
-  for (let i = 1; i <= data.jamPerHari; i++) {
-    const el = document.getElementById(`jt-${i}`);
-    if (el) data.jamTimes.push(el.value);
-  }
-
-  const histori = getHistori();
-  const timestamp = new Date().toLocaleString('id-ID');
-  const newItem = {
-    timestamp,
-    label: `${data.kelas || 'Kelas'} - ${data.sekolah || 'Tanpa Sekolah'} (${timestamp})`,
-    data: data
-  };
-  histori.unshift(newItem); // tambahkan di awal (terbaru)
-  if (histori.length > MAX_HISTORI) histori.pop(); // batasi jumlah
-  setHistori(histori);
-  showToast('📜 Jadwal tersimpan di histori');
-}
-
-// Tampilkan modal histori
-function tampilkanHistori() {
-  const histori = getHistori();
-  const listDiv = document.getElementById('histori-list');
-  if (histori.length === 0) {
-    listDiv.innerHTML = '<p style="text-align:center; color:var(--text2);">Belum ada histori.</p>';
-  } else {
-    let html = '';
-    histori.forEach((item, index) => {
-      html += `
-        <div class="histori-item">
-          <div class="histori-info" onclick="muatDariHistori(${index})">
-            <div class="histori-judul">${item.label}</div>
-            <div class="histori-tanggal">${item.timestamp}</div>
-          </div>
-          <div class="histori-actions">
-            <button class="btn btn-ghost" style="padding:4px 8px;" onclick="hapusItemHistori(${index}); event.stopPropagation();">🗑️</button>
-          </div>
-        </div>
-      `;
-    });
-    listDiv.innerHTML = html;
-  }
-  document.getElementById('histori-modal').style.display = 'flex';
-}
-
-function closeHistoriModal() {
-  document.getElementById('histori-modal').style.display = 'none';
-}
-
-// Muat data dari histori berdasarkan index
-function muatDariHistori(index) {
-  const histori = getHistori();
-  if (!histori[index]) return;
-  const data = histori[index].data;
-  // Isi form
-  document.getElementById('nama-sekolah').value = data.sekolah || '';
-  document.getElementById('nama-kelas').value = data.kelas || '';
-  document.getElementById('semester').value = data.semester || '';
-  document.getElementById('tgl-mulai').value = data.tgl || '';
-  document.getElementById('jam-per-hari').value = data.jamPerHari || 10;
-  buildJamConfig();
-  if (data.jamTimes && Array.isArray(data.jamTimes)) {
-    for (let i = 0; i < data.jamTimes.length; i++) {
-      const el = document.getElementById(`jt-${i+1}`);
-      if (el) el.value = data.jamTimes[i];
-    }
-  }
-  document.getElementById('kodes').value = data.kodes || '';
-  document.getElementById('kodes').dispatchEvent(new Event('input'));
-  generateJadwal();
-  closeHistoriModal();
-  showToast('📜 Histori dimuat');
-}
-
-// Hapus satu item histori
-function hapusItemHistori(index) {
-  const histori = getHistori();
-  histori.splice(index, 1);
-  setHistori(histori);
-  tampilkanHistori(); // refresh tampilan modal
-  showToast('Item histori dihapus');
-}
-
-// Hapus semua histori
-function clearHistori() {
-  if (confirm('Hapus semua histori?')) {
-    setHistori([]);
-    closeHistoriModal();
-    showToast('Semua histori dihapus');
-  }
-}
-
-// === FITUR LINK PENDEK (SHARE VIA URL) ===
-function getShortLink() {
-  // Kumpulkan semua data dari form
-  const data = {
-    s: document.getElementById('nama-sekolah').value,
-    k: document.getElementById('nama-kelas').value,
-    sem: document.getElementById('semester').value,
-    t: document.getElementById('tgl-mulai').value,
-    jph: document.getElementById('jam-per-hari').value,
-    jt: [],
-    kd: document.getElementById('kodes').value
-  };
+// Fungsi untuk menampilkan modal share
+function showShareModal(shareUrl, imageDataUrl) {
+  const modal = document.getElementById('share-modal');
+  const previewContainer = document.getElementById('share-preview-container');
+  const linkInput = document.getElementById('share-link');
   
-  // Ambil data jam
-  for (let i = 1; i <= data.jph; i++) {
-    const el = document.getElementById(`jt-${i}`);
-    if (el) data.jt.push(el.value);
-  }
+  // Tampilkan preview gambar
+  previewContainer.innerHTML = `<img src="${imageDataUrl}" alt="Preview Jadwal" style="max-width:100%; max-height:300px; border-radius:8px;">`;
   
-  // Kompres dengan lz-string
-  const json = JSON.stringify(data);
-  const compressed = LZString.compressToEncodedURIComponent(json);
+  // Set link
+  linkInput.value = shareUrl;
   
-  // Buat URL pendek (gunakan current URL tanpa hash)
-  const url = window.location.href.split('#')[0] + '#' + compressed;
-  
-  // Salin ke clipboard
-  navigator.clipboard.writeText(url).then(() => {
-    showToast('🔗 Link pendek disalin ke clipboard!');
+  // Tampilkan modal
+  modal.style.display = 'flex';
+}
+
+function closeShareModal() {
+  document.getElementById('share-modal').style.display = 'none';
+}
+
+function copyShareLink() {
+  const linkInput = document.getElementById('share-link');
+  linkInput.select();
+  navigator.clipboard.writeText(linkInput.value).then(() => {
+    showToast('✅ Link disalin!');
   }).catch(() => {
-    showToast('❌ Gagal menyalin link');
+    showToast('❌ Gagal menyalin');
   });
+}
+
+// === FUNGSI UNTUK PREVIEW PAGE ===
+
+// Fungsi untuk memuat preview berdasarkan ID
+function loadPreviewFromId(id) {
+  const imageDataUrl = getSharedImage(id);
+  const scheduleData = getSharedData(id);
+  
+  if (!imageDataUrl || !scheduleData) {
+    // Tampilkan error jika data tidak ditemukan
+    document.body.innerHTML = `
+      <div style="max-width:600px; margin:50px auto; text-align:center; padding:30px; background:var(--surface); border-radius:var(--radius);">
+        <h2 style="color:var(--accent); margin-bottom:16px;">Jadwal Tidak Ditemukan</h2>
+        <p style="color:var(--text2); margin-bottom:24px;">Maaf, jadwal yang Anda cari tidak ada atau sudah kadaluarsa.</p>
+        <a href="/" class="btn btn-primary">Kembali ke Editor</a>
+      </div>
+    `;
+    return;
+  }
+  
+  // Sembunyikan konten utama
+  document.querySelector('header').style.display = 'none';
+  document.querySelector('main').style.display = 'none';
+  document.querySelector('footer').style.display = 'none';
+  
+  // Tampilkan halaman preview
+  const previewPage = document.getElementById('preview-page');
+  previewPage.style.display = 'block';
+  
+  // Tampilkan gambar
+  const previewContainer = document.getElementById('preview-container');
+  previewContainer.innerHTML = `
+    <img src="${imageDataUrl}" alt="Jadwal Pelajaran" style="max-width:100%; height:auto; display:block; margin:0 auto;">
+    <div style="margin-top:20px; text-align:center; color:var(--text2); font-size:0.9rem;">
+      <p>${scheduleData.sekolah || ''} • ${scheduleData.kelas || ''} • ${scheduleData.semester || ''}</p>
+      <p>Dibagikan pada: ${new Date(scheduleData.timestamp).toLocaleString('id-ID')}</p>
+    </div>
+  `;
+  
+  // Simpan data untuk fungsi download
+  window.previewImageDataUrl = imageDataUrl;
+  window.previewData = scheduleData;
+}
+
+function downloadPreviewJPG() {
+  if (window.previewImageDataUrl) {
+    const a = document.createElement('a');
+    a.href = window.previewImageDataUrl;
+    a.download = `Jadwal-${window.previewData?.kelas || 'Share'}.jpg`;
+    a.click();
+    showToast('✅ Gambar diunduh!');
+  }
+}
+
+function goToEditor() {
+  window.location.href = window.location.href.split('?')[0];
 }
 
 // ── Toast ──
@@ -1311,66 +1173,56 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ── Modal Ramadhan ──
-function showModal() {
-  document.getElementById('ramadhan-modal').style.display = 'flex';
-}
-
-function closeModal() {
-  document.getElementById('ramadhan-modal').style.display = 'none';
-}
-
+// ── Inisialisasi dan Cek Parameter URL ──
 window.addEventListener('load', function() {
-  setTimeout(showModal, 1000);
+  // Cek parameter share di URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const shareId = urlParams.get('share');
   
-  // Cek apakah ada hash di URL (untuk fitur link)
-  if (window.location.hash) {
-    try {
-      const hash = window.location.hash.substring(1); // hapus tanda #
-      const json = LZString.decompressFromEncodedURIComponent(hash);
-      if (!json) throw new Error('Gagal dekompres');
-      const data = JSON.parse(json);
-      
-      // Isi form dengan data yang sudah didekompres
-      document.getElementById('nama-sekolah').value = data.s || '';
-      document.getElementById('nama-kelas').value = data.k || '';
-      document.getElementById('semester').value = data.sem || '';
-      document.getElementById('tgl-mulai').value = data.t || '';
-      document.getElementById('jam-per-hari').value = data.jph || 10;
-      
-      buildJamConfig();
-      
-      // Isi jam jika ada
-      if (data.jt && Array.isArray(data.jt)) {
-        for (let i = 0; i < data.jt.length; i++) {
-          const el = document.getElementById(`jt-${i+1}`);
-          if (el) el.value = data.jt[i];
+  if (shareId) {
+    // Load preview
+    loadPreviewFromId(shareId);
+  } else {
+    // Tampilkan editor normal
+    document.querySelector('header').style.display = 'flex';
+    document.querySelector('main').style.display = 'block';
+    document.querySelector('footer').style.display = 'block';
+    
+    // Cek hash untuk data tersimpan (opsional)
+    if (window.location.hash) {
+      try {
+        const hash = window.location.hash.substring(1);
+        const json = LZString.decompressFromEncodedURIComponent(hash);
+        if (json) {
+          const data = JSON.parse(json);
+          document.getElementById('nama-sekolah').value = data.s || '';
+          document.getElementById('nama-kelas').value = data.k || '';
+          document.getElementById('semester').value = data.sem || '';
+          document.getElementById('tgl-mulai').value = data.t || '';
+          document.getElementById('jam-per-hari').value = data.jph || 10;
+          buildJamConfig();
+          if (data.jt && Array.isArray(data.jt)) {
+            for (let i = 0; i < data.jt.length; i++) {
+              const el = document.getElementById(`jt-${i+1}`);
+              if (el) el.value = data.jt[i];
+            }
+          }
+          document.getElementById('kodes').value = data.kd || '';
+          document.getElementById('kodes').dispatchEvent(new Event('input'));
+          generateJadwal();
+          showToast('✅ Data dari link dimuat');
         }
+      } catch (e) {
+        console.error('Gagal memuat data dari hash', e);
       }
-      
-      // Set checkbox jam
-      if (data.jt && data.jt.every(j => j === '')) {
-        document.getElementById('clear-jam-checkbox').checked = true;
-      } else {
-        document.getElementById('clear-jam-checkbox').checked = false;
-      }
-      
-      // Isi kode dan generate
-      document.getElementById('kodes').value = data.kd || '';
-      document.getElementById('kodes').dispatchEvent(new Event('input'));
-      generateJadwal(); // langsung generate
-      
-      showToast('✅ Data dari link dimuat');
-    } catch (e) {
-      console.error('Gagal memuat data dari link', e);
-      showToast('❌ Link tidak valid');
     }
   }
 });
 </script>
 
 <footer style="text-align:center; margin: 20px 0; font-size:0.75rem; color:var(--text2);">
-  dibuat oleh <a href="https://www.instagram.com/a.farhanhan/" target="_blank">Ammar Farhan</a> | <a href="https://github.com/farhanboutak/jadwal" target="_blank">GitHub</a> | <a href="https://github.com/farhanboutak/jadwal" target="_blank">Version: 0.2.1</a>
+ dibuat oleh <a href="https://www.instagram.com/a.farhanhan/" target="_blank">Ammar Farhan</a> | <a href="https://github.com/farhanboutak/jadwal" target="_blank">GitHub</a> | <a href="https://github.com/farhanboutak/jadwal" target="_blank">Version: 0.2.2</a>
+  <a href="#" onclick="window.location.href=window.location.href.split('?')[0];return false;">Editor</a>
 </footer>
 </body>
 </html>
